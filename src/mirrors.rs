@@ -9,13 +9,14 @@ pub fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
         .get("https://www.linuxfromscratch.org/lfs/mirrors.html#files")
         .send()?
         .text()?;
+
     let document = Html::parse_document(&res);
     let selector = Selector::parse("a[href^='http']").unwrap();
+
     let mirrors = document
         .select(&selector)
         .filter_map(|element| {
             let href = element.value().attr("href")?;
-            // Basic filtering to get potential mirror URLs
             if href.contains("ftp.gnu.org") || href.contains("mirror") {
                 Some(href.to_string())
             } else {
@@ -23,25 +24,20 @@ pub fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
             }
         })
         .collect();
+
     Ok(mirrors)
 }
 
 pub fn choose_package_mirror() -> Option<String> {
-    let mirrors = match fetch_mirrors() {
-        Ok(mirrors) => mirrors,
-        Err(e) => {
-            println!("Failed to fetch mirrors: {}", e);
-            // Fallback to a default list if fetching fails
-            vec![
-                "ftp.fau.de".to_string(),
-                "mirror.kernel.org".to_string(),
-                "mirror.example.org".to_string(),
-            ]
-        }
-    };
+    let mirrors = fetch_mirrors().unwrap_or_else(|_| {
+        vec![
+            "ftp.fau.de".to_string(),
+            "mirror.kernel.org".to_string(),
+            "mirror.example.org".to_string(),
+        ]
+    });
 
-    println!("Optional: choose a mirror for GNU source packages (replace ftp.gnu.org):");
-
+    println!("Optional: choose a mirror for GNU source packages:");
     for (i, mirror) in mirrors.iter().enumerate() {
         println!("  [{}] {}", i + 1, mirror);
     }
