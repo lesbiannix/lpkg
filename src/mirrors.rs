@@ -1,8 +1,17 @@
 use console::Style;
+use reqwest::blocking::Client;
+use scraper::{Html, Selector};
 use std::io::{self, Write};
 
 pub fn choose_package_mirror() -> Option<String> {
-    let mirrors = vec!["ftp.fau.de", "mirror.kernel.org", "mirror.example.org"];
+    let mirrors = match fetch_mirrors() {
+        Ok(mirrors) => mirrors,
+        Err(e) => {
+            println!("Failed to fetch mirrors: {}", e);
+            // Fallback to a default list if fetching fails
+            vec!["ftp.fau.de".to_string(), "mirror.kernel.org".to_string(), "mirror.example.org".to_string()]
+        }
+    };
 
     println!("Optional: choose a mirror for GNU source packages (replace ftp.gnu.org):");
 
@@ -28,4 +37,26 @@ pub fn choose_package_mirror() -> Option<String> {
         );
         Some(chosen.to_string())
     }
+}
+
+fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let client = Client::new();
+    // Fetching from the LFS mirrors page as it lists mirrors for various projects, including GNU
+    let res = client.get("https://www.linuxfromscratch.org/lfs/mirrors.html#files").send()?.text()?;
+    let document = Html::parse_document(&res);
+    // This selector targets links that are likely to be mirrors. Adjust if needed.
+    let selector = Selector::parse("a[href^='http']").unwrap();
+    let mirrors = document
+        .select(&selector)
+        .filter_map(|element| {
+            let href = element.value().attr("href")?;
+            // Basic filtering to get potential mirror URLs
+            if href.contains("ftp.gnu.org") || href.contains("mirror") {
+                Some(href.to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+    Ok(mirrors)
 }
