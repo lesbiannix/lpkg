@@ -19,16 +19,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         // TUI-Modus
         tui::tui_menu()?;
-        Ok(())
+        return Ok(());
     }
 
     #[cfg(not(feature = "tui"))]
     {
-        // --- Dynamische Version-Prüfung aus HTML ---
-        let json = html::fetch_and_parse_html_to_json(
+        // --- Dynamische Version-Prüfung direkt aus HTML ---
+        let ok = version_check::run_version_checks_from_html(
             "https://www.linuxfromscratch.org/~thomas/multilib-m32/chapter02/hostreqs.html",
         )?;
-        version_check::run_version_checks_from_json(&json);
+
+        if !ok {
+            eprintln!(
+                "{} Some version checks failed. Exiting.",
+                style("❌").red().bold()
+            );
+            std::process::exit(1);
+        }
 
         println!(
             "{} All version checks passed. Starting downloader...",

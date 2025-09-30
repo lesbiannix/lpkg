@@ -1,5 +1,6 @@
 use reqwest;
 use scraper::{Html, Selector};
+use semver::Version;
 use std::process::Command;
 
 /// Führt ein Kommando aus und gibt die erste Zeile der Version zurück
@@ -12,8 +13,18 @@ fn run_command(cmd: &str, args: &[&str]) -> Option<String> {
     }
 }
 
-/// Vergleicht zwei Versionen
+/// Vergleicht zwei Versionen mit semver (für Programme)
 fn check_version(installed: &str, required: &str) -> bool {
+    let i = Version::parse(installed).ok();
+    let r = Version::parse(required).ok();
+    match (i, r) {
+        (Some(i), Some(r)) => i >= r,
+        _ => false,
+    }
+}
+
+/// Vergleicht Kernel-Versionen (numerisch)
+fn check_kernel_version(installed: &str, required: &str) -> bool {
     let parse_ver = |v: &str| {
         v.split(['.', '-'])
             .filter_map(|s| s.parse::<u32>().ok())
@@ -48,7 +59,7 @@ fn ver_check(program: &str, cmd: &str, min_version: &str) -> bool {
                 println!("OK:    {:<12} {:<8} >= {}", program, ver, min_version);
                 true
             } else {
-                println!(
+                eprintln!(
                     "ERROR: {:<12} version {} is too old ({} required)",
                     program, ver, min_version
                 );
@@ -56,7 +67,7 @@ fn ver_check(program: &str, cmd: &str, min_version: &str) -> bool {
             }
         }
         None => {
-            println!("ERROR: Cannot find {}", program);
+            eprintln!("ERROR: Cannot find {}", program);
             false
         }
     }
@@ -65,11 +76,11 @@ fn ver_check(program: &str, cmd: &str, min_version: &str) -> bool {
 /// Führt die Kernel-Prüfung durch
 fn ver_kernel(min_version: &str) -> bool {
     let kernel = run_command("uname", &["-r"]).unwrap_or_default();
-    if check_version(&kernel, min_version) {
+    if check_kernel_version(&kernel, min_version) {
         println!("OK:    Linux Kernel {} >= {}", kernel, min_version);
         true
     } else {
-        println!(
+        eprintln!(
             "ERROR: Linux Kernel {} is too old ({} required)",
             kernel, min_version
         );
@@ -78,7 +89,7 @@ fn ver_kernel(min_version: &str) -> bool {
 }
 
 /// Lädt die LFS-Seite und führt alle Versionsprüfungen aus
-pub fn run_version_checks_from_html(url: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run_version_checks_from_html(url: &str) -> Result<bool, Box<dyn std::error::Error>> {
     let html_text = reqwest::blocking::get(url)?.text()?;
     let document = Html::parse_document(&html_text);
     let selector = Selector::parse("pre").unwrap();
@@ -112,7 +123,7 @@ pub fn run_version_checks_from_html(url: &str) -> Result<(), Box<dyn std::error:
             if output.to_lowercase().contains(&expected.to_lowercase()) {
                 println!("OK:    {:<4} is {}", cmd, expected);
             } else {
-                println!("ERROR: {:<4} is NOT {}", cmd, expected);
+                eprintln!("ERROR: {:<4} is NOT {}", cmd, expected);
             }
         }
     };
@@ -122,23 +133,25 @@ pub fn run_version_checks_from_html(url: &str) -> Result<(), Box<dyn std::error:
     alias_check("sh", "Bash");
 
     // Compiler-Test
-    if run_command("g++", &["-x", "c++", "-"]).is_some() {
+    if run_command("g++", &["--version"]).is_some() {
         println!("OK:    g++ works");
     } else {
-        println!("ERROR: g++ does NOT work");
+        eprintln!("ERROR: g++ does NOT work");
+        ok = false;
     }
 
     // nproc-Test
     let nproc = run_command("nproc", &[]).unwrap_or_default();
     if nproc.is_empty() {
-        println!("ERROR: nproc is not available or empty");
+        eprintln!("ERROR: nproc is not available or empty");
+        ok = false;
     } else {
         println!("OK:    nproc reports {} logical cores available", nproc);
     }
 
     if !ok {
-        println!("Some version checks failed.");
+        eprintln!("Some version checks failed.");
     }
 
-    Ok(())
+    Ok(ok)
 }
