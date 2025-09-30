@@ -1,0 +1,31 @@
+use console::Style;
+use std::io::{self, Write};
+
+pub fn choose_package_mirror() -> Option<String> {
+    let mirrors = vec!["ftp.fau.de", "mirror.kernel.org", "mirror.example.org"];
+
+    println!("Optional: choose a mirror for GNU source packages (replace ftp.gnu.org):");
+
+    for (i, mirror) in mirrors.iter().enumerate() {
+        println!("  [{}] {}", i + 1, mirror);
+    }
+
+    print!("Enter number or press Enter for default: ");
+    io::stdout().flush().unwrap();
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).unwrap();
+    let input = input.trim();
+
+    if input.is_empty() {
+        None
+    } else {
+        let choice = input.parse::<usize>().unwrap_or(1);
+        let chosen = mirrors.get(choice.saturating_sub(1)).unwrap_or(&mirrors[0]);
+        println!(
+            "Using package mirror: {}",
+            Style::new().green().apply_to(chosen)
+        );
+        Some(chosen.to_string())
+    }
+}

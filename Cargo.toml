@@ -1,0 +1,13 @@
+[package]
+name = "package_management"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+console = "0.16.1"
+indicatif = "0.18.0"
+md5 = "0.8.0"
+rand = "0.9.2"
+reqwest = { version = "0.12.23", features = ["blocking", "json"] }
+serde = { version = "1.0.228", features = ["derive"] }
+
