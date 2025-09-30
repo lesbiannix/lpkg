@@ -15,6 +15,8 @@ use ratatui::{
     widgets::{Block, Borders, List, ListItem, ListState},
 };
 #[cfg(feature = "tui")]
+use spinners::{Spinner, Spinners};
+#[cfg(feature = "tui")]
 use std::{
     collections::HashMap,
     env,
@@ -93,7 +95,7 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
         let mut mirrors_list: Vec<String> = Vec::new();
         let mut selected_mirror: Option<String> = None;
         let log_messages: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
-        let progress_state: Arc<Mutex<HashMap<String, String>>> =
+        let progress_state: Arc<Mutex<HashMap<String, Option<Spinner>>>> =
             Arc::new(Mutex::new(HashMap::new()));
 
         let (tx, rx) = channel::<String>();
@@ -116,7 +118,6 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
                     )
                     .split(size);
 
-                // Render menu items
                 for (i, item) in menu_items.iter().enumerate() {
                     let style = if Some(i) == state.selected() {
                         Style::default().bg(Color::Blue).fg(Color::White)
@@ -130,7 +131,6 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
                     );
                 }
 
-                // Render logs & progress
                 let logs = log_messages.lock().unwrap();
                 let mut combined_logs: Vec<ListItem> = logs
                     .iter()
@@ -140,8 +140,13 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
                     .collect();
 
                 let progress = progress_state.lock().unwrap();
-                for (file, status) in progress.iter() {
-                    combined_logs.push(ListItem::new(format!("{}: {}", file, status)));
+                for (file, spinner_opt) in progress.iter() {
+                    let display_status = if let Some(spinner) = spinner_opt {
+                        spinner.to_string()
+                    } else {
+                        "✅ Done".to_string()
+                    };
+                    combined_logs.push(ListItem::new(format!("{}: {}", file, display_status)));
                 }
 
                 f.render_widget(
@@ -159,13 +164,11 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
                         KeyCode::Up => state.select(state.selected().map(|i| i.saturating_sub(1))),
                         KeyCode::Enter => match state.selected() {
                             Some(0) => {
-                                // Init environment
                                 let (path, msg) = init_environment();
                                 lfs_sources = Some(path);
                                 log_messages.lock().unwrap().push(msg);
                             }
                             Some(1) => {
-                                // Mirror selection
                                 if mirrors_list.is_empty() {
                                     mirrors_list = mirrors::fetch_mirrors().unwrap_or_else(|_| {
                                         vec![
@@ -232,60 +235,52 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
                                 }
                             }
                             Some(2) => {
-                                // Download packages
                                 if let Some(ref path) = lfs_sources {
-                                    let mirror: Option<String> = selected_mirror.clone(); // Correct Option<String>
-                                    log_messages.lock().unwrap().push(format!(
-                                        "Using mirror: {}",
-                                        mirror.clone().unwrap_or_else(|| "default mirror".into())
-                                    ));
-
-                                    let path_clone = path.clone();
-                                    let log_clone = Arc::clone(&log_messages);
-                                    let tx_clone = tx.clone();
+                                    let mirror = selected_mirror
+                                        .clone()
+                                        .unwrap_or_else(|| "ftp.fau.de".to_string());
                                     let wget_list = prepare_wget_list();
                                     let md5_map = prepare_md5_map();
 
                                     if wget_list.is_empty() {
-                                        log_clone
+                                        log_messages
                                             .lock()
                                             .unwrap()
                                             .push("⚠️ No packages to download!".into());
                                         continue;
                                     }
 
-                                    // Initialize progress
-                                    {
-                                        let mut prog = progress_state.lock().unwrap();
-                                        prog.clear();
-                                        for file in &wget_list {
-                                            prog.insert(file.clone(), "Pending".into());
-                                        }
-                                    }
-
-                                    // Spawn download thread
                                     let progress_clone = Arc::clone(&progress_state);
+                                    let tx_clone = tx.clone();
+                                    let path_clone = path.clone();
+
                                     thread::spawn(move || {
                                         for file in wget_list {
+                                            let spinner = Spinner::new(
+                                                Spinners::Dots9,
+                                                format!("Downloading {}", file),
+                                            );
                                             progress_clone
                                                 .lock()
                                                 .unwrap()
-                                                .insert(file.clone(), "Downloading...".into());
+                                                .insert(file.clone(), Some(spinner));
+
                                             let result = downloader::download_files(
                                                 &file,
                                                 &path_clone,
-                                                mirror.clone(),
+                                                Some(mirror.clone()),
                                                 Some(&md5_map),
                                             );
-                                            let status = match result {
-                                                Ok(_) => "✅ Done",
-                                                Err(_) => "❌ Failed",
-                                            };
                                             progress_clone
                                                 .lock()
                                                 .unwrap()
-                                                .insert(file.clone(), status.to_string());
-                                            let _ = tx_clone.send(format!("{} {}", status, file));
+                                                .insert(file.clone(), None);
+
+                                            let status_msg = match result {
+                                                Ok(_) => format!("✅ {}", file),
+                                                Err(_) => format!("❌ {}", file),
+                                            };
+                                            let _ = tx_clone.send(status_msg);
                                         }
                                         let _ = tx_clone.send("🎉 All downloads complete!".into());
                                     });
