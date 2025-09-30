@@ -29,8 +29,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let lfs_sources = match env::var("LFS") {
         Ok(lfs) => PathBuf::from(lfs).join("sources"),
         Err(_) => {
-            let mut rng = rand::thread_rng();
-            let random_number: u32 = rng.gen_range(1000..=9999);
+            let mut rng = rand::rng();
+            let random_number: u32 = rng.random_range(1000..=9999);
             let tmp_path = format!("/tmp/lfs_{}", random_number);
             println!(
                 "{} Using temporary path {}",

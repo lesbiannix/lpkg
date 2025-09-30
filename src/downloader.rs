@@ -49,7 +49,7 @@ pub fn download_files(
         let md5_map = md5_map.clone();
 
         let handle = thread::spawn(move || -> Result<(), Box<dyn std::error::Error + Send>> {
-            let filename = url.split('/').last().unwrap_or("file.tar.xz");
+            let filename = url.split('/').next_back().unwrap_or("file.tar.xz");
             let filepath = target_dir.join(filename);
 
             let download_url = if let Some(ref mirror) = package_mirror {

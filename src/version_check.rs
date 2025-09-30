@@ -1,5 +1,4 @@
 use std::process::Command;
-use std::str::FromStr;
 
 pub fn run_command(cmd: &str, args: &[&str]) -> Option<String> {
     let output = Command::new(cmd).args(args).output().ok()?;
@@ -12,7 +11,7 @@ pub fn run_command(cmd: &str, args: &[&str]) -> Option<String> {
 
 pub fn check_version(installed: &str, required: &str) -> bool {
     let parse_ver = |v: &str| {
-        v.split(|c| c == '.' || c == '-')
+        v.split(['.', '-'])
             .filter_map(|s| s.parse::<u32>().ok())
             .collect::<Vec<_>>()
     };
