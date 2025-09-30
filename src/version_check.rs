@@ -1,6 +1,9 @@
+use reqwest;
+use scraper::{Html, Selector};
 use std::process::Command;
 
-pub fn run_command(cmd: &str, args: &[&str]) -> Option<String> {
+/// Führt ein Kommando aus und gibt die erste Zeile der Version zurück
+fn run_command(cmd: &str, args: &[&str]) -> Option<String> {
     let output = Command::new(cmd).args(args).output().ok()?;
     if output.status.success() {
         Some(String::from_utf8_lossy(&output.stdout).trim().to_string())
@@ -9,7 +12,8 @@ pub fn run_command(cmd: &str, args: &[&str]) -> Option<String> {
     }
 }
 
-pub fn check_version(installed: &str, required: &str) -> bool {
+/// Vergleicht zwei Versionen
+fn check_version(installed: &str, required: &str) -> bool {
     let parse_ver = |v: &str| {
         v.split(['.', '-'])
             .filter_map(|s| s.parse::<u32>().ok())
@@ -29,8 +33,9 @@ pub fn check_version(installed: &str, required: &str) -> bool {
     i.len() >= r.len()
 }
 
-pub fn ver_check(program: &str, arg: &str, min_version: &str) -> bool {
-    match run_command(program, &[arg]) {
+/// Führt eine Version-Prüfung durch
+fn ver_check(program: &str, cmd: &str, min_version: &str) -> bool {
+    match run_command(cmd, &["--version"]) {
         Some(output) => {
             let ver = output
                 .lines()
@@ -57,27 +62,83 @@ pub fn ver_check(program: &str, arg: &str, min_version: &str) -> bool {
     }
 }
 
-pub fn run_version_checks() -> bool {
+/// Führt die Kernel-Prüfung durch
+fn ver_kernel(min_version: &str) -> bool {
+    let kernel = run_command("uname", &["-r"]).unwrap_or_default();
+    if check_version(&kernel, min_version) {
+        println!("OK:    Linux Kernel {} >= {}", kernel, min_version);
+        true
+    } else {
+        println!(
+            "ERROR: Linux Kernel {} is too old ({} required)",
+            kernel, min_version
+        );
+        false
+    }
+}
+
+/// Lädt die LFS-Seite und führt alle Versionsprüfungen aus
+pub fn run_version_checks_from_html(url: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let html_text = reqwest::blocking::get(url)?.text()?;
+    let document = Html::parse_document(&html_text);
+    let selector = Selector::parse("pre").unwrap();
+
     let mut ok = true;
 
-    ok &= ver_check("bash", "--version", "3.2");
-    ok &= ver_check("gcc", "--version", "5.4");
-    ok &= ver_check("make", "--version", "4.0");
-    ok &= ver_check("tar", "--version", "1.22");
+    for element in document.select(&selector) {
+        let pre_text = element.text().collect::<Vec<_>>().join("\n");
 
-    // Kernel check
-    if let Some(kernel) = run_command("uname", &["-r"]) {
-        if check_version(&kernel, "5.4") {
-            println!("OK:    Linux Kernel {} >= 5.4", kernel);
-        } else {
-            println!("ERROR: Linux Kernel {} is too old (5.4 required)", kernel);
-            ok = false;
+        for line in pre_text.lines() {
+            let line = line.trim();
+            if line.starts_with("ver_check") {
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                if parts.len() >= 4 {
+                    let prog = parts[1];
+                    let cmd = parts[2];
+                    let ver = parts[3];
+                    ok &= ver_check(prog, cmd, ver);
+                }
+            } else if line.starts_with("ver_kernel") {
+                if let Some(ver) = line.split_whitespace().nth(1) {
+                    ok &= ver_kernel(ver);
+                }
+            }
         }
     }
 
-    // CPU cores
-    let cores = num_cpus::get();
-    println!("OK:    {} logical cores available", cores);
+    // Alias-Checks
+    let alias_check = |cmd: &str, expected: &str| {
+        if let Some(output) = run_command(cmd, &["--version"]) {
+            if output.to_lowercase().contains(&expected.to_lowercase()) {
+                println!("OK:    {:<4} is {}", cmd, expected);
+            } else {
+                println!("ERROR: {:<4} is NOT {}", cmd, expected);
+            }
+        }
+    };
 
-    ok
+    alias_check("awk", "GNU");
+    alias_check("yacc", "Bison");
+    alias_check("sh", "Bash");
+
+    // Compiler-Test
+    if run_command("g++", &["-x", "c++", "-"]).is_some() {
+        println!("OK:    g++ works");
+    } else {
+        println!("ERROR: g++ does NOT work");
+    }
+
+    // nproc-Test
+    let nproc = run_command("nproc", &[]).unwrap_or_default();
+    if nproc.is_empty() {
+        println!("ERROR: nproc is not available or empty");
+    } else {
+        println!("OK:    nproc reports {} logical cores available", nproc);
+    }
+
+    if !ok {
+        println!("Some version checks failed.");
+    }
+
+    Ok(())
 }

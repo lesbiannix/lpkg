@@ -3,6 +3,29 @@ use reqwest::blocking::Client;
 use scraper::{Html, Selector};
 use std::io::{self, Write};
 
+pub fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let client = Client::new();
+    let res = client
+        .get("https://www.linuxfromscratch.org/lfs/mirrors.html#files")
+        .send()?
+        .text()?;
+    let document = Html::parse_document(&res);
+    let selector = Selector::parse("a[href^='http']").unwrap();
+    let mirrors = document
+        .select(&selector)
+        .filter_map(|element| {
+            let href = element.value().attr("href")?;
+            // Basic filtering to get potential mirror URLs
+            if href.contains("ftp.gnu.org") || href.contains("mirror") {
+                Some(href.to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+    Ok(mirrors)
+}
+
 pub fn choose_package_mirror() -> Option<String> {
     let mirrors = match fetch_mirrors() {
         Ok(mirrors) => mirrors,
@@ -41,27 +64,4 @@ pub fn choose_package_mirror() -> Option<String> {
         );
         Some(chosen.to_string())
     }
-}
-
-pub fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let client = Client::new();
-    let res = client
-        .get("https://www.linuxfromscratch.org/lfs/mirrors.html#files")
-        .send()?
-        .text()?;
-    let document = Html::parse_document(&res);
-    let selector = Selector::parse("a[href^='http']").unwrap();
-    let mirrors = document
-        .select(&selector)
-        .filter_map(|element| {
-            let href = element.value().attr("href")?;
-            // Basic filtering to get potential mirror URLs
-            if href.contains("ftp.gnu.org") || href.contains("mirror") {
-                Some(href.to_string())
-            } else {
-                None
-            }
-        })
-        .collect();
-    Ok(mirrors)
 }
