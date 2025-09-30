@@ -13,79 +13,74 @@ use ratatui::{
     widgets::{Block, Borders, List, ListItem, ListState},
 };
 #[cfg(feature = "tui")]
-use spinners::{Spinner, Spinners};
+use std::collections::HashMap;
 #[cfg(feature = "tui")]
 use std::io::{self, stdout};
 #[cfg(feature = "tui")]
 use std::path::PathBuf;
 #[cfg(feature = "tui")]
-use std::process::Command;
+use std::time::{Duration, Instant};
 
 #[cfg(feature = "tui")]
 use crate::{downloader, mirrors, wget_list};
 
 #[cfg(feature = "tui")]
 fn init_environment() -> PathBuf {
-    let tmp_path = "/tmp/lfs_tmp"; // Simplified for demo
+    let tmp_path = format!("/tmp/lfs_{}", rand::random::<u32>() % 9000 + 1000);
+    println!("ℹ️ Using temporary path {}", tmp_path);
     PathBuf::from(tmp_path).join("sources")
 }
 
 #[cfg(feature = "tui")]
-fn download_packages(lfs_sources: &PathBuf) {
-    let spinner = Spinner::new(Spinners::Dots9, "Downloading packages...".into());
-    let wget_list = wget_list::get_wget_list().unwrap_or_default();
-    let package_mirror =
-        mirrors::choose_package_mirror().unwrap_or_else(|| "ftp.fau.de".to_string());
+fn select_mirrors_tui(mirrors: Vec<String>) -> Vec<String> {
+    if mirrors.is_empty() {
+        return vec![];
+    }
 
-    // Simplified download call
-    let _ = downloader::download_files(&wget_list, lfs_sources, Some(package_mirror), None);
-
-    spinner.stop();
-}
-
-#[cfg(feature = "tui")]
-fn format_drive_tui() -> Result<(), Box<dyn std::error::Error>> {
-    // Mocked drive list for demo
-    let drives = vec!["/dev/sda".to_string(), "/dev/sdb".to_string()];
+    let mut selected: Vec<bool> = vec![false; mirrors.len()];
     let mut state = ListState::default();
     state.select(Some(0));
 
-    enable_raw_mode()?;
     let mut stdout = stdout();
-    execute!(stdout, EnterAlternateScreen)?;
+    execute!(stdout, EnterAlternateScreen).unwrap();
+    enable_raw_mode().unwrap();
     let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
+    let mut terminal = Terminal::new(backend).unwrap();
 
     loop {
-        terminal.draw(|f| {
-            let size = f.size();
-            let block = Block::default()
-                .title("💾 Format Drive")
-                .borders(Borders::ALL);
-            f.render_widget(block, size);
+        terminal
+            .draw(|f| {
+                let size = f.size();
+                let block = Block::default()
+                    .title("Select mirrors (space to toggle, Enter to confirm)")
+                    .borders(Borders::ALL);
+                f.render_widget(block, size);
 
-            let chunks = Layout::default()
-                .direction(Direction::Vertical)
-                .margin(2)
-                .constraints(vec![Constraint::Length(3); drives.len()])
-                .split(size);
+                let chunks = Layout::default()
+                    .direction(Direction::Vertical)
+                    .margin(2)
+                    .constraints(vec![Constraint::Length(3); mirrors.len()])
+                    .split(size);
 
-            for (i, drive) in drives.iter().enumerate() {
-                let mut style = Style::default();
-                if Some(i) == state.selected() {
-                    style = style.bg(Color::Red).fg(Color::White);
+                for (i, mirror) in mirrors.iter().enumerate() {
+                    let mut style = Style::default();
+                    if Some(i) == state.selected() {
+                        style = style.bg(Color::Red).fg(Color::White);
+                    }
+                    let prefix = if selected[i] { "[x] " } else { "[ ] " };
+                    let list_item = ListItem::new(format!("{}{}", prefix, mirror)).style(style);
+                    let list =
+                        List::new(vec![list_item]).block(Block::default().borders(Borders::ALL));
+                    f.render_widget(list, chunks[i]);
                 }
-                let list_item = ListItem::new(drive.clone()).style(style);
-                let list = List::new(vec![list_item]).block(Block::default().borders(Borders::ALL));
-                f.render_widget(list, chunks[i]);
-            }
-        })?;
+            })
+            .unwrap();
 
-        if let Event::Key(key) = event::read()? {
+        if let Event::Key(key) = event::read().unwrap() {
             match key.code {
                 KeyCode::Down => {
                     let i = state.selected().unwrap_or(0);
-                    if i < drives.len() - 1 {
+                    if i < mirrors.len() - 1 {
                         state.select(Some(i + 1));
                     }
                 }
@@ -95,33 +90,77 @@ fn format_drive_tui() -> Result<(), Box<dyn std::error::Error>> {
                         state.select(Some(i - 1));
                     }
                 }
-                KeyCode::Enter => {
-                    if let Some(idx) = state.selected() {
-                        let drive = &drives[idx];
-                        disable_raw_mode()?;
-                        execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
-                        println!("⚠️  Confirm formatting {}? (y/n)", drive);
-                        let mut input = String::new();
-                        io::stdin().read_line(&mut input)?;
-                        if matches!(input.trim().to_lowercase().as_str(), "y" | "yes") {
-                            println!("Formatting {}...", drive);
-                            let _ = Command::new("mkfs.ext4").arg(drive).status();
-                            println!("✅ Done!");
-                        }
-                        enable_raw_mode()?;
-                        execute!(terminal.backend_mut(), EnterAlternateScreen)?;
-                    }
+                KeyCode::Char(' ') => {
+                    let i = state.selected().unwrap_or(0);
+                    selected[i] = !selected[i];
                 }
-                KeyCode::Esc => break,
+                KeyCode::Enter => {
+                    disable_raw_mode().unwrap();
+                    execute!(terminal.backend_mut(), LeaveAlternateScreen).unwrap();
+                    return mirrors
+                        .into_iter()
+                        .enumerate()
+                        .filter_map(|(i, m)| if selected[i] { Some(m) } else { None })
+                        .collect();
+                }
+                KeyCode::Esc => {
+                    disable_raw_mode().unwrap();
+                    execute!(terminal.backend_mut(), LeaveAlternateScreen).unwrap();
+                    return vec![];
+                }
                 _ => {}
             }
         }
     }
+}
 
-    disable_raw_mode()?;
-    execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
-    terminal.show_cursor()?;
-    Ok(())
+#[cfg(feature = "tui")]
+fn download_packages(lfs_sources: &PathBuf) {
+    let mirrors_list = mirrors::fetch_mirrors().unwrap_or_else(|_| vec![]);
+    let selected_mirrors = select_mirrors_tui(mirrors_list);
+    if selected_mirrors.is_empty() {
+        println!("⚠️ No mirrors selected!");
+        return;
+    }
+
+    let wget_list = wget_list::get_wget_list().unwrap_or_default();
+    if wget_list.is_empty() {
+        println!("⚠️ No packages to download!");
+        return;
+    }
+
+    let mut md5_map = HashMap::new();
+    if let Ok(md5_content) = crate::md5_utils::get_md5sums() {
+        for line in md5_content.lines() {
+            if let Some((hash, filename)) = line.split_once(' ') {
+                md5_map.insert(filename.to_string(), hash.to_string());
+            }
+        }
+    }
+
+    for file in wget_list {
+        let mut downloaded = false;
+        for mirror in &selected_mirrors {
+            print!("⬇️ Downloading {} from {} ... ", file, mirror);
+            io::stdout().flush().unwrap();
+
+            let start = Instant::now();
+            if downloader::download_files(&file, lfs_sources, Some(mirror.clone()), Some(&md5_map))
+                .is_ok()
+            {
+                println!("✅ done in {:?}", start.elapsed());
+                downloaded = true;
+                break;
+            } else {
+                println!("⚠️ failed, trying next mirror...");
+            }
+        }
+        if !downloaded {
+            println!("❌ Failed to download {}", file);
+        }
+    }
+
+    println!("🎉 All downloads finished!");
 }
 
 #[cfg(feature = "tui")]
@@ -129,14 +168,13 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
     let mut stdout = stdout();
     execute!(stdout, EnterAlternateScreen)?;
     enable_raw_mode()?;
-
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
     let menu_items = vec![
         "🌱 Init environment",
         "📦 Download packages",
-        "💾 Format drive",
+        "🔍 Check status",
         "❌ Exit",
     ];
     let mut state = ListState::default();
@@ -192,9 +230,7 @@ pub fn tui_menu() -> Result<(), Box<dyn std::error::Error>> {
                             println!("⚠️ Please initialize environment first!");
                         }
                     }
-                    Some(2) => {
-                        format_drive_tui()?;
-                    }
+                    Some(2) => println!("🔍 Status selected! (TODO)"),
                     Some(3) | _ => break,
                 },
                 KeyCode::Esc => break,
