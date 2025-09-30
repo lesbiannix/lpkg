@@ -3,7 +3,6 @@ use tracing::{error, info};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 
-mod downloader;
 mod tui;
 mod wget_list;
 

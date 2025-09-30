@@ -1,74 +1,103 @@
-# 🌟 lpkg CLI Roadmap 🌈
+# 🧬 LPKG – Lightweight Package Manager
 
-`lpkg` is going to have a cute, intuitive, and powerful CLI to **bootstrap environments** and **manage packages**. Each command is themed with emojis to make your workflow extra magical 💖✨.
-
----
-
-## ✨ Core Commands
-
-| Command              | Emoji | Description                                       |
-| -------------------- | ----- | ------------------------------------------------- |
-| `lpkg init`          | 🌱    | Bootstraps a new environment from scratch         |
-| `lpkg setup`         | 🛠    | Sets up packages, dependencies, and config files  |
-| `lpkg install <pkg>` | 📦    | Installs a package                                |
-| `lpkg update <pkg>`  | 🔄    | Updates a package to the latest version           |
-| `lpkg remove <pkg>`  | ❌     | Removes a package                                 |
-| `lpkg list`          | 📜    | Lists all installed packages                      |
-| `lpkg status`        | 🔍    | Shows the status of your environment and packages |
+LPKG is a minimalistic package manager written in Rust, designed for fast and simple software management on Unix-like systems. It emphasizes reproducibility and declarative configuration, leveraging **Nix Flakes** for development and deployment.
 
 ---
 
-## 🌈 Advanced & Magical Commands
+## 🚀 Features
 
-| Command          | Emoji | Description                                                               |
-| ---------------- | ----- | ------------------------------------------------------------------------- |
-| `lpkg bootstrap` | 🚀    | Full bootstrapping + package installation in one magical command          |
-| `lpkg doctor`    | 🩺    | Checks your system for missing dependencies or broken configs             |
-| `lpkg clean`     | 🧹    | Cleans up cache, temp files, and old builds                               |
-| `lpkg export`    | ✨📦   | Exports a manifest of installed packages (for sharing your magical setup) |
-| `lpkg import`    | ✨📥   | Imports a manifest to reproduce an environment exactly                    |
+* **Fast & Lightweight** – Minimal resource usage and quick operations.
+* **Rust-Powered** – Safe and concurrent code with Rust.
+* **Cross-Platform** – Works on Linux and macOS.
+* **Declarative Builds** – Fully reproducible with Nix Flakes.
+* **Simple CLI** – Intuitive commands for managing packages.
 
 ---
 
-## 💫 Example Workflows
+## ⚙️ Installation
 
-### 1️⃣ Bootstrapping a new environment
+### Using Cargo
 
 ```bash
-lpkg init 🌱
-lpkg setup 🛠
-lpkg install neovim 📦
-lpkg install starship 📦
-lpkg status 🔍
+cargo install lpkg
 ```
 
-### 2️⃣ Updating packages
+### Using Nix Flakes
+
+If you have Nix with flakes enabled:
 
 ```bash
-lpkg update starship 🔄
-lpkg update neovim 🔄
+nix profile install github:lesbiannix/lpkg
 ```
 
-### 3️⃣ Cleaning up old stuff
+Or to run without installing:
 
 ```bash
-lpkg clean 🧹
-```
-
-### 4️⃣ Sharing your magical setup
-
-```bash
-lpkg export ✨📦 > my-setup.yaml
-lpkg import ✨📥 my-setup.yaml
+nix run github:lesbiannix/lpkg
 ```
 
 ---
 
-## 🚀 Future CLI Enhancements
+## 🧰 Usage
 
-* 🏳️‍⚧️ Interactive CLI mode (`lpkg magic-mode ✨`)
-* 🌈 Auto-detect missing packages and suggest fixes (`lpkg auto-fix 🔮`)
-* 💖 CLI themes with rainbow colors, cute prompts, and ASCII art 💫
-* 📦 Integration with Nix flakes for fully reproducible environments
+Basic command structure:
+
+```bash
+lpkg [command] [package]
+```
+
+Common commands:
+
+* `install` – Install a package
+* `remove` – Remove a package
+* `update` – Update the package list
+* `upgrade` – Upgrade all installed packages
+
+For detailed usage:
+
+```bash
+lpkg --help
+```
+
+---
+
+## 🔧 Development with Flakes
+
+Clone the repository:
+
+```bash
+git clone https://github.com/lesbiannix/lpkg.git
+cd lpkg
+```
+
+Enter the flake development shell:
+
+```bash
+nix develop
+```
+
+Build the project:
+
+```bash
+cargo build
+```
+
+Run tests:
+
+```bash
+cargo test
+```
+
+You can also run the project directly in the flake shell:
+
+```bash
+nix run
+```
+
+---
+
+## 📄 License
+
+LPKG is licensed under the [MIT License](LICENSE).
 
 
