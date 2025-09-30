@@ -2,25 +2,80 @@
 name = "package_management"
 version = "0.1.0"
 edition = "2024"
+authors = ["Lucy <lucy@c-base.org>"]
+description = "A Rust project for package management with CLI and optional TUI support."
+license = "MIT"
 
 [dependencies]
+# CLI utilities
 anyhow = "1.0.100"
-clap = { version = "4.5.48", features= ["derive"] }
+clap = { version = "4.5.48", features = ["derive"] }
 console = "0.16.1"
-crossterm = { version = "0.29.0", optional = true }
-html_parser = "0.7.0"
-indicatif = "0.18.0"
-md5 = "0.8.0"
-num_cpus = "1.17.0"
-rand = "0.9.2"
-ratatui = { version = "0.29.0", optional = true }
-regex = "1.11.3"
-reqwest = { version = "0.12.23", features = ["blocking", "json"] }
-scraper = "0.19.0"
 
+# Optional Terminal UI
+crossterm = { version = "0.29.0", optional = true }
+ratatui = { version = "0.29.0", optional = true }
+
+# Parsing & scraping
+html_parser = "0.7.0"
+scraper = "0.19.0"
+regex = "1.11.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
+
+# Utilities
+indicatif = "0.18.0"
 spinners = "4.1.1"
+num_cpus = "1.17.0"
+rand = "0.9.2"
+md5 = "0.8.0"
+
+# HTTP
+reqwest = { version = "0.12.23", features = ["blocking", "json"] }
 
 [features]
+# TUI feature flag
 tui = ["ratatui", "crossterm"]
+
+# Optional default features
+default = []
+
+# -----------------------
+# Cargo-make tasks
+# -----------------------
+[tasks.format]
+description = "Format Rust code using rustfmt"
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--emit=files"]
+
+[tasks.clean]
+description = "Clean build artifacts"
+command = "cargo"
+args = ["clean"]
+
+[tasks.build]
+description = "Build the project"
+command = "cargo"
+args = ["build"]
+dependencies = ["clean"]
+
+[tasks.test]
+description = "Run tests"
+command = "cargo"
+args = ["test"]
+dependencies = ["clean"]
+
+[tasks.my-flow]
+description = "Run full workflow: format, build, test"
+dependencies = ["format", "build", "test"]
+
+[tasks.dev-flow]
+description = "Full developer workflow: format, lint, build, test"
+dependencies = ["format", "clippy", "build", "test"]
+
+[tasks.release-build]
+description = "Build the project in release mode"
+command = "cargo"
+args = ["build", "--release", "--all-features"]
+dependencies = ["clean"]

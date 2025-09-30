@@ -32,6 +32,8 @@
               pkg-config
               openssl
               gemini-cli-bin
+              rustfmt
+              cargo-make
             ];
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
