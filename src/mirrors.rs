@@ -43,7 +43,7 @@ pub fn choose_package_mirror() -> Option<String> {
     }
 }
 
-fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+pub fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let client = Client::new();
     let res = client
         .get("https://www.linuxfromscratch.org/lfs/mirrors.html#files")
