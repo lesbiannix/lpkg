@@ -10,7 +10,6 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // LFS sources Pfad
     let lfs_sources = match env::var("LFS") {
         Ok(lfs) => PathBuf::from(lfs).join("sources"),
         Err(_) => {
@@ -26,10 +25,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    // Mirror für Pakete auswählen
     let package_mirror = mirrors::choose_package_mirror();
 
-    // Wget-Liste vom Original LFS-Mirror holen
     let wget_list = wget_list::get_wget_list()?;
 
     // MD5 Map vorbereiten
@@ -42,7 +39,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // Pakete herunterladen + Live-MD5 prüfen
     downloader::download_files(&wget_list, &lfs_sources, package_mirror, Some(&md5_map))?;
 
     println!("{} All done!", style("🎉").green().bold());

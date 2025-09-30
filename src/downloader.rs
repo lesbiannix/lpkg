@@ -7,10 +7,8 @@ use std::thread;
 
 use console::style;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
-use md5;
 use reqwest::blocking::Client;
 
-/// Prüft Datei gegen erwarteten MD5-Hash
 fn verify_md5(file_path: &Path, expected_hash: &str) -> bool {
     let mut f = match File::open(file_path) {
         Ok(f) => f,
@@ -25,7 +23,6 @@ fn verify_md5(file_path: &Path, expected_hash: &str) -> bool {
     hex == expected_hash
 }
 
-/// Download + Live-MD5-Prüfung
 pub fn download_files(
     wget_list: &str,
     target_dir: &Path,
@@ -39,7 +36,6 @@ pub fn download_files(
     let client = Arc::new(Client::new());
     let mp = Arc::new(MultiProgress::new());
 
-    // Clone md5_map before the loop so we can move it into threads
     let md5_map = md5_map.cloned();
 
     let mut handles = vec![];
@@ -106,7 +102,6 @@ pub fn download_files(
                 pb.set_position(downloaded);
             }
 
-            // Live-MD5-Prüfung
             let status = if let Some(ref md5_map) = md5_map {
                 if let Some(expected_hash) = md5_map.get(filename) {
                     if verify_md5(&filepath, expected_hash) {

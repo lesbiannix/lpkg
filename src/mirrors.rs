@@ -9,7 +9,11 @@ pub fn choose_package_mirror() -> Option<String> {
         Err(e) => {
             println!("Failed to fetch mirrors: {}", e);
             // Fallback to a default list if fetching fails
-            vec!["ftp.fau.de".to_string(), "mirror.kernel.org".to_string(), "mirror.example.org".to_string()]
+            vec![
+                "ftp.fau.de".to_string(),
+                "mirror.kernel.org".to_string(),
+                "mirror.example.org".to_string(),
+            ]
         }
     };
 
@@ -41,10 +45,11 @@ pub fn choose_package_mirror() -> Option<String> {
 
 fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
     let client = Client::new();
-    // Fetching from the LFS mirrors page as it lists mirrors for various projects, including GNU
-    let res = client.get("https://www.linuxfromscratch.org/lfs/mirrors.html#files").send()?.text()?;
+    let res = client
+        .get("https://www.linuxfromscratch.org/lfs/mirrors.html#files")
+        .send()?
+        .text()?;
     let document = Html::parse_document(&res);
-    // This selector targets links that are likely to be mirrors. Adjust if needed.
     let selector = Selector::parse("a[href^='http']").unwrap();
     let mirrors = document
         .select(&selector)

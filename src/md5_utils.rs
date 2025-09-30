@@ -1,9 +1,3 @@
-use console::style;
-use md5;
-use std::fs::File;
-use std::io::{BufRead, BufReader, Read};
-use std::path::Path;
-
 pub fn get_md5sums() -> Result<String, Box<dyn std::error::Error>> {
     let client = reqwest::blocking::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
@@ -14,5 +8,3 @@ pub fn get_md5sums() -> Result<String, Box<dyn std::error::Error>> {
         .text()?;
     Ok(res)
 }
-
-
