@@ -109,6 +109,13 @@ RUSTFLAGS="-Cprofile-use=target/pgo-data/lpkg.profdata -Cllvm-args=-pgo-warn-mis
   cargo pgo-build
 ```
 
+Regenerate project artefacts (README and SVG logo):
+
+```bash
+cargo run --bin readme_gen
+cargo run --bin logo_gen
+```
+
 Run tests:
 
 ```bash

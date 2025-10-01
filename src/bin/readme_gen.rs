@@ -136,6 +136,8 @@ llvm-profdata merge -o target/pgo-data/lpkg.profdata target/pgo-data/*.profraw
 RUSTFLAGS="-Cprofile-use=target/pgo-data/lpkg.profdata -Cllvm-args=-pgo-warn-missing-function" \
   cargo pgo-build"#,
             )
+            .paragraph("Regenerate project artefacts (README and SVG logo):")
+            .code_block("bash", "cargo run --bin readme_gen\ncargo run --bin logo_gen")
             .paragraph("Run tests:")
             .code_block("bash", "cargo test")
             .paragraph("You can also run the project directly in the flake shell:")
