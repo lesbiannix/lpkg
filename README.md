@@ -146,6 +146,8 @@ Add `--overwrite` to regenerate an existing module directory.
   layout, binaries, and supporting modules.
 - [Metadata Harvesting Pipeline](docs/METADATA_PIPELINE.md) – how the metadata
   indexer produces and validates the JSON records under `ai/metadata/`.
+- [Package Module Generation](docs/PACKAGE_GENERATION.md) – end-to-end guide
+  for converting harvested metadata into Rust modules under `src/pkgs/by_name/`.
 - `ai/notes.md` – scratchpad for ongoing research tasks (e.g., deeper jhalfs
   integration).
 

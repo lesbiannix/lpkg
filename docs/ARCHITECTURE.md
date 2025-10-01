@@ -9,7 +9,7 @@ outline the main entry points and how the supporting modules fit together.
 | Binary | Location | Purpose |
 | ------ | -------- | ------- |
 | `lpkg` | `src/main.rs` | Primary command-line interface with workflow automation and optional TUI integration. |
-| `metadata_indexer` | `src/bin/metadata_indexer.rs` | Harvests LFS/BLFS/GLFS package metadata, validates it against the JSON schema, and keeps `ai/metadata/index.json` up to date. |
+| `metadata_indexer` | `src/bin/metadata_indexer.rs` | Harvests LFS/BLFS/GLFS package metadata, validates it against the JSON schema, keeps `ai/metadata/index.json` up to date, and can scaffold Rust modules from harvested records. |
 
 ### `lpkg` workflows
 

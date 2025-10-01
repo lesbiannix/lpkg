@@ -7,7 +7,8 @@
   `wget-list`/`md5sums` manifests into `ai/metadata/cache/` and the `harvest`
   command automatically draws URLs and checksums from those manifests. A
   `generate` subcommand consumes harvested metadata and scaffolds Rust modules
-  under `src/pkgs/by_name` (or a custom output directory).
+  under `src/pkgs/by_name` (or a custom output directory). See
+  `docs/PACKAGE_GENERATION.md` for the CLI flow.
 - AI state lives under `ai/`:
   - `ai/personas.json`, `ai/tasks.json`, `ai/bugs.json` track personas,
     outstanding work, and known issues.
