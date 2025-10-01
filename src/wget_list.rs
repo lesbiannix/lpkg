@@ -1,16 +1,17 @@
-use anyhow::Result;
-use reqwest::blocking::Client;
-use reqwest::redirect::Policy;
+use anyhow::{Context, Result};
 
 pub fn get_wget_list() -> Result<String> {
-    let client = Client::builder().redirect(Policy::limited(5)).build()?;
-    let res = client
-        .get("https://www.linuxfromscratch.org/~thomas/multilib-m32/wget-list-sysv")
-        .send()?;
-
-    if !res.status().is_success() {
-        anyhow::bail!("Failed to fetch wget-list: HTTP {}", res.status());
-    }
-
-    Ok(res.text()?)
+    let url = "https://www.linuxfromscratch.org/~thomas/multilib-m32/wget-list-sysv";
+    let agent = ureq::AgentBuilder::new().redirects(5).build();
+    agent
+        .get(url)
+        .call()
+        .map_err(|err| match err {
+            ureq::Error::Status(code, _) => {
+                anyhow::anyhow!("Failed to fetch wget-list: HTTP {code}")
+            }
+            other => anyhow::anyhow!("Failed to fetch wget-list: {other}"),
+        })?
+        .into_string()
+        .with_context(|| format!("reading body from {url}"))
 }

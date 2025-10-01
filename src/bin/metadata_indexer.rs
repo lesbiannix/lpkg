@@ -2,12 +2,11 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
 use chrono::Utc;
 use clap::{Parser, Subcommand};
 use jsonschema::JSONSchema;
 use regex::Regex;
-use reqwest::{blocking::Client, redirect::Policy};
 use scraper::{ElementRef, Html, Selector};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -379,6 +378,16 @@ fn extract_summary(value: &Value, relative_path: &Path) -> Result<PackageSummary
         .and_then(Value::as_str)
         .context("missing status.state")?
         .to_string();
+    let tags = status
+        .get("tags")
+        .and_then(Value::as_array)
+        .map(|array| {
+            array
+                .iter()
+                .filter_map(|value| value.as_str().map(|s| s.to_string()))
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
 
     Ok(PackageSummary {
         schema_version,
@@ -393,6 +402,7 @@ fn extract_summary(value: &Value, relative_path: &Path) -> Result<PackageSummary
             .to_str()
             .unwrap_or_default()
             .replace('\\', "/"),
+        tags,
     })
 }
 
@@ -409,18 +419,7 @@ fn harvest_metadata(
     override_base: Option<&str>,
 ) -> Result<HarvestResult> {
     let page_url = resolve_page_url(book, page, override_base)?;
-    let client = Client::builder()
-        .user_agent("lpkg-metadata-indexer/0.1")
-        .build()?;
-    let response = client
-        .get(&page_url)
-        .send()
-        .with_context(|| format!("fetching {}", page_url))?
-        .error_for_status()
-        .with_context(|| format!("non-success status for {}", page_url))?;
-    let html = response
-        .text()
-        .with_context(|| format!("reading response body from {}", page_url))?;
+    let html = fetch_text(&page_url).with_context(|| format!("fetching {page_url}"))?;
 
     let document = Html::parse_document(&html);
     let harvest = build_metadata_value(metadata_dir, book, &page_url, &document, &html)?;
@@ -637,6 +636,7 @@ fn build_metadata_value(
     };
 
     let status_state = "draft";
+    let stage_tag = stage.clone().unwrap_or_else(|| "base-system".to_string());
 
     let package_json = json!({
         "schema_version": "v0.1.0",
@@ -687,10 +687,7 @@ fn build_metadata_value(
         "status": {
             "state": status_state,
             "issues": issues,
-            "tags": vec![
-                "25.10".to_string(),
-                stage.unwrap_or("base-system").to_string()
-            ]
+            "tags": vec!["25.10".to_string(), stage_tag.clone()]
         }
     });
 
@@ -940,20 +937,23 @@ fn refresh_manifest(
     let url = manifest_url(book, &kind)
         .with_context(|| format!("no manifest URL configured for book '{}'", book))?;
 
-    let client = Client::builder().redirect(Policy::limited(5)).build()?;
-    let body = client
-        .get(url)
-        .send()
-        .with_context(|| format!("fetching {}", url))?
-        .error_for_status()
-        .with_context(|| format!("request failed for {}", url))?
-        .text()
-        .with_context(|| format!("reading response body from {}", url))?;
+    let body = fetch_text(url).with_context(|| format!("fetching {url}"))?;
 
     fs::write(&cache_path, &body)
         .with_context(|| format!("caching manifest {}", cache_path.display()))?;
 
     Ok(cache_path)
+}
+
+fn fetch_text(url: &str) -> Result<String> {
+    ureq::get(url)
+        .call()
+        .map_err(|err| match err {
+            ureq::Error::Status(code, _) => anyhow!("request failed: HTTP {code}"),
+            other => anyhow!("request failed: {other}"),
+        })?
+        .into_string()
+        .with_context(|| format!("reading response body from {url}"))
 }
 
 fn manifest_url(book: &str, kind: &ManifestKind) -> Option<&'static str> {

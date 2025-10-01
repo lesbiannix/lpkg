@@ -1,16 +1,15 @@
-use anyhow::Result;
-use reqwest::blocking::Client;
-use reqwest::redirect::Policy;
+use anyhow::{Context, Result};
 
 pub fn get_md5sums() -> Result<String> {
-    let client = Client::builder().redirect(Policy::limited(5)).build()?;
-    let res = client
-        .get("https://www.linuxfromscratch.org/~thomas/multilib-m32/md5sums")
-        .send()?;
+    let agent = ureq::AgentBuilder::new().redirects(5).build();
+    let url = "https://www.linuxfromscratch.org/~thomas/multilib-m32/md5sums";
 
-    if !res.status().is_success() {
-        anyhow::bail!("Failed to fetch MD5sums: HTTP {}", res.status());
-    }
+    let response = agent.get(url).call().map_err(|err| match err {
+        ureq::Error::Status(code, _) => anyhow::anyhow!("Failed to fetch MD5sums: HTTP {code}"),
+        other => anyhow::anyhow!("Failed to fetch MD5sums: {other}"),
+    })?;
 
-    Ok(res.text()?)
+    response
+        .into_string()
+        .with_context(|| format!("reading body from {url}"))
 }

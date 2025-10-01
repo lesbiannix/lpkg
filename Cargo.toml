@@ -15,6 +15,9 @@ console = "0.16.1"
 # Optional Terminal UI
 crossterm = { version = "0.29.0", optional = true }
 tui = { version = "0.19.0", optional = true }
+rsille = { version = "2.3", optional = true }
+gptman = { version = "2.0.1", optional = true }
+uuid = { version = "1.18.1", optional = true, features = ["v4"] }
 
 # Parsing & scraping
 html_parser = "0.7.0"
@@ -22,78 +25,42 @@ scraper = "0.19.0"
 regex = "1.11.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
-jsonschema = "0.17.0"
+jsonschema = { version = "0.17.0", default-features = false, features = ["draft202012"] }
 walkdir = "2.5.0"
 chrono = { version = "0.4.38", default-features = false, features = ["clock"] }
 sha2 = "0.10.8"
 
 # Utilities
-indicatif = "0.18.0"
-spinners = "4.1.1"
 num_cpus = "1.17.0"
-rand = "0.9.2"
+rand = { version = "0.9.2", optional = true }
 md5 = "0.8.0"
 
 # HTTP
-reqwest = { version = "0.12.23", features = ["blocking", "json"] }
 semver = "1.0.27"
 inquire = "0.9.1"
-tracing = "0.1.41"
-tracing-appender = "0.2.3"
-tracing-subscriber = { version = "0.3.20", features = ["env-filter", "fmt"] }
-gptman = "2.0.1"
-dialoguer = "0.12.0"
-tokio = { version = "1.47.1", features = ["full"] }
+juniper = { version = "0.17", optional = true }
+actix-web = { version = "4.9", optional = true }
+juniper_actix = { version = "0.7", optional = true }
 shell-words = "1.1.0"
 url = "2.5.7"
-uuid = { version = "1.18.1", features = ["v4"] }
 hex = "0.4.3"
 diesel = { version = "2.1.6", features = ["sqlite", "r2d2", "returning_clauses_for_sqlite_3_35"] }
+
+# Networking
+ureq = { version = "2.9.7", features = ["tls", "json"] }
 
 
 [features]
 # TUI feature flag
-tui = ["dep:tui", "dep:crossterm"]
+tui = ["dep:tui", "dep:crossterm", "dep:rsille", "dep:gptman", "dep:uuid"]
+
+# GraphQL/HTTP server feature flag
+graphql = ["dep:juniper", "dep:actix-web", "dep:juniper_actix", "dep:rand"]
 
 # Optional default features
 default = []
 
-# -----------------------
-# Cargo-make tasks
-# -----------------------
-[tasks.format]
-description = "Format Rust code using rustfmt"
-install_crate = "rustfmt"
-command = "cargo"
-args = ["fmt", "--", "--emit=files"]
-
-[tasks.clean]
-description = "Clean build artifacts"
-command = "cargo"
-args = ["clean"]
-
-[tasks.build]
-description = "Build the project"
-command = "cargo"
-args = ["build"]
-dependencies = ["clean"]
-
-[tasks.test]
-description = "Run tests"
-command = "cargo"
-args = ["test"]
-dependencies = ["clean"]
-
-[tasks.my-flow]
-description = "Run full workflow: format, build, test"
-dependencies = ["format", "build", "test"]
-
-[tasks.dev-flow]
-description = "Full developer workflow: format, lint, build, test"
-dependencies = ["format", "clippy", "build", "test"]
-
-[tasks.release-build]
-description = "Build the project in release mode"
-command = "cargo"
-args = ["build", "--release", "--all-features"]
-dependencies = ["clean"]
+[[bin]]
+name = "graphql_server"
+path = "src/bin/graphql_server.rs"
+required-features = ["graphql"]

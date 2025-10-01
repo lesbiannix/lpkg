@@ -7,7 +7,7 @@ use package_management::{
     db, html, md5_utils,
     pkgs::{
         by_name::bi::binutils::cross_toolchain::build_binutils_from_page,
-        mlfs,
+        generator, mlfs,
         scaffolder::{self, ScaffoldRequest},
     },
     version_check, wget_list,
@@ -134,8 +134,6 @@ enum TuiCommand {
 }
 
 fn main() -> Result<()> {
-    let _ = tracing_subscriber::fmt::try_init();
-
     let cli = Cli::parse();
 
     match cli.command {
@@ -219,10 +217,8 @@ fn run_workflow(cmd: WorkflowCommand) -> Result<()> {
             lfs_root,
             target,
         } => {
-            let runtime = tokio::runtime::Runtime::new().context("Creating async runtime")?;
-            runtime
-                .block_on(build_binutils_from_page(&url, &lfs_root, target))
-                .map_err(|e| anyhow!("Building Binutils using instructions from {url}: {e}"))?;
+            build_binutils_from_page(&url, &lfs_root, target)
+                .with_context(|| format!("Building Binutils using instructions from {url}"))?;
 
             println!("Binutils workflow completed successfully");
         }
@@ -306,6 +302,14 @@ fn run_workflow(cmd: WorkflowCommand) -> Result<()> {
             let mut created = 0usize;
             let mut skipped = Vec::new();
 
+            let metadata_entries = match mlfs::load_metadata_index() {
+                Ok(entries) => Some(entries),
+                Err(err) => {
+                    eprintln!("[mlfs] metadata index error: {err}");
+                    None
+                }
+            };
+
             let pool = if dry_run {
                 None
             } else {
@@ -313,17 +317,91 @@ fn run_workflow(cmd: WorkflowCommand) -> Result<()> {
             };
 
             for record in records {
-                let module_alias = record.module_alias();
-                if !seen.insert(module_alias.clone()) {
-                    continue;
-                }
-
                 if let Some(limit) = limit {
                     if processed >= limit {
                         break;
                     }
                 }
                 processed += 1;
+
+                let metadata_entry = metadata_entries
+                    .as_ref()
+                    .and_then(|entries| mlfs::match_metadata(&record, entries));
+
+                let mut request = if let Some(entry) = metadata_entry {
+                    let path = PathBuf::from("ai/metadata").join(&entry.path);
+                    match generator::request_from_metadata(&path) {
+                        Ok(req) => req,
+                        Err(err) => {
+                            eprintln!(
+                                "[mlfs] metadata apply error for {} {}: {}",
+                                record.name, record.version, err
+                            );
+                            ScaffoldRequest {
+                                name: record.name.clone(),
+                                version: record.version.clone(),
+                                source: None,
+                                md5: None,
+                                configure_args: Vec::new(),
+                                build_commands: Vec::new(),
+                                install_commands: Vec::new(),
+                                dependencies: Vec::new(),
+                                enable_lto: true,
+                                enable_pgo: true,
+                                cflags: Vec::new(),
+                                ldflags: Vec::new(),
+                                profdata: None,
+                                stage: record.stage.clone(),
+                                variant: record.variant.clone(),
+                                notes: record.notes.clone(),
+                                module_override: None,
+                            }
+                        }
+                    }
+                } else {
+                    ScaffoldRequest {
+                        name: record.name.clone(),
+                        version: record.version.clone(),
+                        source: None,
+                        md5: None,
+                        configure_args: Vec::new(),
+                        build_commands: Vec::new(),
+                        install_commands: Vec::new(),
+                        dependencies: Vec::new(),
+                        enable_lto: true,
+                        enable_pgo: true,
+                        cflags: Vec::new(),
+                        ldflags: Vec::new(),
+                        profdata: None,
+                        stage: record.stage.clone(),
+                        variant: record.variant.clone(),
+                        notes: record.notes.clone(),
+                        module_override: None,
+                    }
+                };
+
+                if request.stage.is_none() {
+                    request.stage = record.stage.clone();
+                }
+                if request.variant.is_none() {
+                    request.variant = record.variant.clone();
+                }
+                if request.notes.is_none() {
+                    request.notes = record.notes.clone();
+                }
+
+                let module_alias = request
+                    .module_override
+                    .clone()
+                    .unwrap_or_else(|| record.module_alias());
+
+                if !seen.insert(module_alias.clone()) {
+                    continue;
+                }
+
+                if request.module_override.is_none() {
+                    request.module_override = Some(module_alias.clone());
+                }
 
                 if dry_run {
                     println!(
@@ -332,26 +410,6 @@ fn run_workflow(cmd: WorkflowCommand) -> Result<()> {
                     );
                     continue;
                 }
-
-                let request = ScaffoldRequest {
-                    name: record.name.clone(),
-                    version: record.version.clone(),
-                    source: None,
-                    md5: None,
-                    configure_args: Vec::new(),
-                    build_commands: Vec::new(),
-                    install_commands: Vec::new(),
-                    dependencies: Vec::new(),
-                    enable_lto: true,
-                    enable_pgo: true,
-                    cflags: Vec::new(),
-                    ldflags: Vec::new(),
-                    profdata: None,
-                    stage: record.stage.clone(),
-                    variant: record.variant.clone(),
-                    notes: record.notes.clone(),
-                    module_override: Some(module_alias.clone()),
-                };
 
                 match scaffolder::scaffold_package(&base_dir, request) {
                     Ok(result) => {

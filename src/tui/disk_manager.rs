@@ -9,7 +9,6 @@ use crossterm::event::{self, Event, KeyCode};
 use crossterm::execute;
 use crossterm::terminal::{EnterAlternateScreen, LeaveAlternateScreen};
 use gptman::{GPT, GPTPartitionEntry, PartitionName};
-use tracing::{info, warn};
 use tui::{
     Terminal,
     backend::CrosstermBackend,
@@ -27,7 +26,6 @@ use uuid::Uuid;
 /// crossterm = "0.26"
 /// gptman = "2.0"
 /// uuid = { version = "1", features = ["v4"] }
-/// tracing = "0.1"
 pub struct DiskManager;
 
 impl DiskManager {
@@ -148,11 +146,11 @@ impl DiskManager {
                             let path = devices[selected_idx].clone();
                             match Self::create_partition_tui(&path, &mut term) {
                                 Ok(m) => {
-                                    info!(target: "disk_manager", "{}", m);
+                                    println!("[disk-manager] {}", m);
                                     status_msg = m;
                                 }
                                 Err(e) => {
-                                    warn!(target: "disk_manager", "create partition error: {:?}", e);
+                                    eprintln!("[disk-manager] create partition error: {e}");
                                     status_msg = format!("Create failed: {}", e);
                                 }
                             }

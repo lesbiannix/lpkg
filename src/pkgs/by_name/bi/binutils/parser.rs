@@ -1,7 +1,6 @@
-// async parser for Binutils Pass 1 page
-use reqwest::Client;
+// Parser for Binutils Pass 1 page using lightweight HTTP fetching.
+use anyhow::{Context, Result};
 use scraper::{Html, Selector};
-use std::error::Error;
 
 #[derive(Debug, Clone)]
 pub struct BinutilsInfo {
@@ -34,16 +33,16 @@ impl Default for BinutilsInfo {
     }
 }
 
-/// Fetch page content (async)
-pub async fn fetch_page(url: &str) -> Result<String, Box<dyn Error>> {
-    let client = Client::new();
-    let res = client.get(url).send().await?;
-    let status = res.status();
-    if !status.is_success() {
-        return Err(format!("Failed to fetch {}: {}", url, status).into());
-    }
-    let text = res.text().await?;
-    Ok(text)
+/// Fetch page content synchronously
+pub fn fetch_page(url: &str) -> Result<String> {
+    ureq::get(url)
+        .call()
+        .map_err(|err| match err {
+            ureq::Error::Status(code, _) => anyhow::anyhow!("Failed to fetch {url}: HTTP {code}"),
+            other => anyhow::anyhow!("Failed to fetch {url}: {other}"),
+        })?
+        .into_string()
+        .with_context(|| format!("reading body from {url}"))
 }
 
 /// Parse the LFS Binutils pass1 page; robust to small formatting changes.
@@ -51,7 +50,7 @@ pub async fn fetch_page(url: &str) -> Result<String, Box<dyn Error>> {
 /// - finds a download URL ending with .tar.xz/.tar.gz
 /// - finds configure pre block(s), builds token list
 /// - finds `make` / `make install` pre blocks
-pub fn parse_binutils(html: &str) -> Result<BinutilsInfo, Box<dyn Error>> {
+pub fn parse_binutils(html: &str) -> Result<BinutilsInfo> {
     let document = Html::parse_document(html);
 
     let mut info = BinutilsInfo::default();

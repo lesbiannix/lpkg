@@ -34,6 +34,7 @@ struct HarvestedMetadata {
 #[derive(Debug, Deserialize)]
 struct HarvestedSource {
     #[serde(default)]
+    #[allow(dead_code)]
     archive: Option<String>,
     #[serde(default)]
     urls: Vec<HarvestedUrl>,
@@ -67,14 +68,18 @@ struct HarvestedOptimisations {
 #[derive(Debug, Deserialize)]
 struct CommandPhase {
     #[serde(default)]
+    #[allow(dead_code)]
     phase: Option<String>,
     #[serde(default)]
     commands: Vec<String>,
     #[serde(default)]
+    #[allow(dead_code)]
     cwd: Option<String>,
     #[serde(default)]
+    #[allow(dead_code)]
     requires_root: Option<bool>,
     #[serde(default)]
+    #[allow(dead_code)]
     notes: Option<String>,
 }
 
@@ -95,6 +100,12 @@ pub fn generate_module(
     let request = build_request(&harvested)?;
     let result = scaffolder::scaffold_package(base_dir.as_ref(), request)?;
     Ok(result.module_path)
+}
+
+/// Build a scaffolding request directly from a metadata JSON file.
+pub fn request_from_metadata(path: impl AsRef<Path>) -> Result<ScaffoldRequest> {
+    let harvested = parse_metadata(path.as_ref())?;
+    build_request(&harvested)
 }
 
 /// Compute the directory for a module derived from the given metadata.

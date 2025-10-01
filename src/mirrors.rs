@@ -1,14 +1,11 @@
 use console::Style;
-use reqwest::blocking::Client;
 use scraper::{Html, Selector};
 use std::io::{self, Write};
 
 pub fn fetch_mirrors() -> Result<Vec<String>, Box<dyn std::error::Error>> {
-    let client = Client::new();
-    let res = client
-        .get("https://www.linuxfromscratch.org/lfs/mirrors.html#files")
-        .send()?
-        .text()?;
+    let res = ureq::get("https://www.linuxfromscratch.org/lfs/mirrors.html#files")
+        .call()?
+        .into_string()?;
 
     let document = Html::parse_document(&res);
     let selector = Selector::parse("a[href^='http']").unwrap();

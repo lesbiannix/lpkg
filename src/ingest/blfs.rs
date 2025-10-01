@@ -1,6 +1,5 @@
 use anyhow::{Context, Result};
 use regex::Regex;
-use reqwest::blocking::Client;
 use scraper::{Html, Selector};
 
 use super::{BookPackage, FetchOptions};
@@ -10,14 +9,10 @@ pub fn fetch_book(options: &FetchOptions) -> Result<Vec<BookPackage>> {
     let base = options.base_url.trim_end_matches('/');
     let url = format!("{base}/book.html");
 
-    let client = Client::builder().build().context("building HTTP client")?;
-    let body = client
-        .get(&url)
-        .send()
-        .with_context(|| format!("fetching {}", url))?
-        .error_for_status()
-        .with_context(|| format!("request failed for {}", url))?
-        .text()
+    let body = ureq::get(&url)
+        .call()
+        .with_context(|| format!("fetching {url}"))?
+        .into_string()
         .context("reading response body")?;
 
     parse_book_html(options, &url, &body)

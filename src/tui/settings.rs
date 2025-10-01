@@ -1,5 +1,4 @@
 use std::io::Stdout;
-use tracing::instrument;
 use tui::{Terminal, backend::CrosstermBackend};
 
 pub struct Settings {
@@ -18,7 +17,6 @@ impl Theme {
 }
 
 impl Settings {
-    #[instrument(skip(_terminal))]
     pub fn show_settings(
         _terminal: &mut Terminal<CrosstermBackend<Stdout>>,
     ) -> Result<(), Box<dyn std::error::Error>> {

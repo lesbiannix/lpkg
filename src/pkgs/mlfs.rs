@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, fs, path::PathBuf};
 
 use anyhow::{Context, Result, anyhow};
 use serde::{Deserialize, Serialize};
@@ -83,6 +83,30 @@ impl MlfsPackageRecord {
     }
 }
 
+#[derive(Debug, Deserialize)]
+struct MetadataIndex {
+    packages: Vec<MetadataPackage>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct MetadataPackage {
+    book: String,
+    id: String,
+    name: String,
+    path: String,
+    stage: Option<String>,
+    variant: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct MlfsMetadataEntry {
+    pub id: String,
+    pub name: String,
+    pub stage: Option<String>,
+    pub variant: Option<String>,
+    pub path: PathBuf,
+}
+
 pub fn fetch_catalog(base_url: &str) -> Result<Vec<MlfsPackageRecord>> {
     let options = FetchOptions::new(base_url, BookKind::Mlfs);
     let packages = lfs::fetch_book(&options)?;
@@ -109,8 +133,75 @@ pub fn load_or_fetch_catalog(base_url: Option<&str>) -> Result<Vec<MlfsPackageRe
     match fetch_catalog(base) {
         Ok(records) => Ok(records),
         Err(err) => {
-            tracing::warn!("mlfs_fetch_error" = %err, "Falling back to cached MLFS package list");
+            eprintln!("[mlfs] fetch error ({err}); falling back to cached MLFS package list");
             load_cached_catalog()
         }
     }
+}
+
+pub fn load_metadata_index() -> Result<Vec<MlfsMetadataEntry>> {
+    let raw = fs::read_to_string("ai/metadata/index.json").context("reading AI metadata index")?;
+    let index: MetadataIndex =
+        serde_json::from_str(&raw).context("parsing AI metadata index JSON")?;
+
+    let entries = index
+        .packages
+        .into_iter()
+        .filter(|pkg| pkg.book.eq_ignore_ascii_case("mlfs"))
+        .map(|pkg| MlfsMetadataEntry {
+            id: pkg.id,
+            name: pkg.name,
+            stage: pkg.stage,
+            variant: pkg.variant,
+            path: PathBuf::from(pkg.path),
+        })
+        .collect();
+
+    Ok(entries)
+}
+
+pub fn match_metadata<'a>(
+    record: &MlfsPackageRecord,
+    entries: &'a [MlfsMetadataEntry],
+) -> Option<&'a MlfsMetadataEntry> {
+    let target_name = normalize(&record.name);
+    let target_variant = normalize_opt(record.variant.as_deref());
+    let target_stage = normalize_opt(record.stage.as_deref());
+
+    entries
+        .iter()
+        .filter(|entry| normalize(&entry.name) == target_name)
+        .max_by_key(|entry| {
+            let mut score = 0;
+            if let (Some(tv), Some(ev)) = (&target_variant, normalize_opt(entry.variant.as_deref()))
+            {
+                if *tv == ev {
+                    score += 4;
+                }
+            }
+            if let (Some(ts), Some(es)) = (&target_stage, normalize_opt(entry.stage.as_deref())) {
+                if *ts == es {
+                    score += 2;
+                }
+            }
+            if target_variant.is_none() && entry.variant.is_none() {
+                score += 1;
+            }
+            if target_stage.is_none() && entry.stage.is_none() {
+                score += 1;
+            }
+            score
+        })
+}
+
+fn normalize(value: &str) -> String {
+    value
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric())
+        .collect::<String>()
+        .to_ascii_lowercase()
+}
+
+fn normalize_opt(value: Option<&str>) -> Option<String> {
+    value.map(normalize)
 }
