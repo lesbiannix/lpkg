@@ -24,7 +24,7 @@
           "minLength": 1
         },
         "upstream": {
-          "type": "string"
+          "type": ["string", "null"]
         },
         "version": {
           "type": "string",
