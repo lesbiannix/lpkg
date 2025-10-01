@@ -1,9 +1,11 @@
 pub mod models;
 pub mod schema;
 
+use std::cmp;
 use std::env;
 
 use anyhow::{Context, Result};
+use diesel::OptionalExtension;
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager};
 use diesel::sqlite::SqliteConnection;
@@ -104,4 +106,99 @@ pub fn load_packages(conn: &mut SqliteConnection) -> Result<Vec<Package>> {
 pub fn load_packages_via_pool(pool: &Pool) -> Result<Vec<Package>> {
     let mut conn = pool.get().context("acquiring database connection")?;
     load_packages(&mut conn)
+}
+
+/// Load package definitions instead of raw Diesel models for convenience.
+pub fn load_package_definitions(conn: &mut SqliteConnection) -> Result<Vec<PackageDefinition>> {
+    load_packages(conn)?
+        .into_iter()
+        .map(|record| record.into_definition())
+        .collect::<Result<Vec<_>>>()
+}
+
+/// Pool-backed helper mirroring [`load_package_definitions`].
+pub fn load_package_definitions_via_pool(pool: &Pool) -> Result<Vec<PackageDefinition>> {
+    let mut conn = pool.get().context("acquiring database connection")?;
+    load_package_definitions(&mut conn)
+}
+
+/// Locate a package by name and optional version, returning the newest matching entry when
+/// the version is not supplied.
+pub fn find_package(
+    conn: &mut SqliteConnection,
+    name: &str,
+    version: Option<&str>,
+) -> Result<Option<Package>> {
+    let mut query = packages_dsl::packages
+        .filter(packages_dsl::name.eq(name))
+        .into_boxed();
+
+    if let Some(version) = version {
+        query = query.filter(packages_dsl::version.eq(version));
+    }
+
+    query
+        .order(packages_dsl::version.desc())
+        .first::<Package>(conn)
+        .optional()
+        .context("querying package by name")
+}
+
+/// Convenience wrapper returning the package as a [`PackageDefinition`].
+pub fn find_package_definition(
+    conn: &mut SqliteConnection,
+    name: &str,
+    version: Option<&str>,
+) -> Result<Option<PackageDefinition>> {
+    Ok(find_package(conn, name, version)?
+        .map(|pkg| pkg.into_definition())
+        .transpose()?)
+}
+
+/// Pool-backed variant of [`find_package_definition`].
+pub fn find_package_definition_via_pool(
+    pool: &Pool,
+    name: &str,
+    version: Option<&str>,
+) -> Result<Option<PackageDefinition>> {
+    let mut conn = pool.get().context("acquiring database connection")?;
+    find_package_definition(&mut conn, name, version)
+}
+
+/// Locate packages using a basic substring match on the name, ordered deterministically and
+/// optionally limited for responsiveness.
+pub fn search_packages(
+    conn: &mut SqliteConnection,
+    term: &str,
+    limit: Option<i64>,
+) -> Result<Vec<Package>> {
+    let trimmed = term.trim();
+    if trimmed.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let normalized: String = trimmed.chars().take(128).collect();
+    let sanitized = normalized.replace('%', "\\%").replace('_', "\\_");
+    let pattern = format!("%{}%", sanitized);
+    let mut query = packages_dsl::packages
+        .filter(packages_dsl::name.like(&pattern))
+        .order((packages_dsl::name, packages_dsl::version))
+        .into_boxed();
+
+    let effective_limit = limit.map(|value| cmp::max(1, value)).unwrap_or(50);
+    query = query.limit(cmp::min(effective_limit, 200));
+
+    query
+        .load::<Package>(conn)
+        .context("searching packages by name")
+}
+
+/// Pool-backed variant of [`search_packages`].
+pub fn search_packages_via_pool(
+    pool: &Pool,
+    term: &str,
+    limit: Option<i64>,
+) -> Result<Vec<Package>> {
+    let mut conn = pool.get().context("acquiring database connection")?;
+    search_packages(&mut conn, term, limit)
 }

@@ -1,5 +1,7 @@
 pub mod ai;
 pub mod db;
+#[cfg(feature = "graphql")]
+pub mod graphql;
 pub mod html;
 pub mod ingest;
 pub mod md5_utils;
