@@ -7,6 +7,7 @@ pub mod ingest;
 pub mod md5_utils;
 pub mod mirrors;
 pub mod pkgs;
+pub mod svg_builder;
 pub mod version_check;
 pub mod wget_list;
 
