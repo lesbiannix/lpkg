@@ -6,6 +6,7 @@
       "title": "Import all MLFS packages into lpkg",
       "description": "Parse the Multilib LFS book and scaffold package definitions with optimization defaults (LTO/PGO/-O3).",
       "blocked_on": [
+        "Finalize metadata -> Rust module generation pipeline",
         "Implement automated parser"
       ],
       "owner": "mlfs_researcher"
@@ -28,6 +29,16 @@
         "Implement incremental update workflow"
       ],
       "owner": "mlfs_researcher"
+    },
+    {
+      "id": "rust-module-generator",
+      "title": "Generate package modules from harvested metadata",
+      "description": "Transform harvested metadata into Rust files under src/pkgs/by_name, wiring PackageDefinition data directly.",
+      "blocked_on": [
+        "Define translation scheme from metadata to PackageDefinition",
+        "Integrate generator with metadata_indexer output"
+      ],
+      "owner": "default_cli"
     }
   ],
   "solved": [
