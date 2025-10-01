@@ -1,0 +1,36 @@
+[tasks.format]
+description = "Format Rust code using rustfmt"
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--", "--emit=files"]
+
+[tasks.clean]
+description = "Clean build artifacts"
+command = "cargo"
+args = ["clean"]
+
+[tasks.build]
+description = "Build the project"
+command = "cargo"
+args = ["build"]
+dependencies = ["clean"]
+
+[tasks.test]
+description = "Run tests"
+command = "cargo"
+args = ["test"]
+dependencies = ["clean"]
+
+[tasks.my-flow]
+description = "Run full workflow: format, build, test"
+dependencies = ["format", "build", "test"]
+
+[tasks.dev-flow]
+description = "Full developer workflow: format, lint, build, test"
+dependencies = ["format", "clippy", "build", "test"]
+
+[tasks.release-build]
+description = "Build the project in release mode"
+command = "cargo"
+args = ["build", "--release", "--all-features"]
+dependencies = ["clean"]

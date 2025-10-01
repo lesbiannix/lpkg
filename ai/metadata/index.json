@@ -1,5 +1,5 @@
 {
-  "generated_at": "2025-10-01T07:30:15.338392+00:00",
+  "generated_at": "2025-10-01T12:09:20.934066+00:00",
   "packages": [
     {
       "book": "mlfs",
@@ -8,6 +8,7 @@
       "path": "packages/mlfs/linux-headers.json",
       "stage": "cross-toolchain",
       "status": "draft",
+      "tags": [],
       "variant": null,
       "version": "6.16.9 API Headers"
     },
@@ -18,6 +19,7 @@
       "path": "packages/mlfs/glibc.json",
       "stage": "cross-toolchain",
       "status": "draft",
+      "tags": [],
       "variant": null,
       "version": "2.42"
     },
@@ -28,6 +30,7 @@
       "path": "packages/mlfs/binutils-pass-1.json",
       "stage": "cross-toolchain",
       "status": "draft",
+      "tags": [],
       "variant": "Pass 1",
       "version": "2.45"
     },
@@ -38,6 +41,7 @@
       "path": "packages/mlfs/gcc-pass-1.json",
       "stage": "cross-toolchain",
       "status": "draft",
+      "tags": [],
       "variant": "Pass 1",
       "version": "15.2.0"
     }
