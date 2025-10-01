@@ -1,0 +1,91 @@
+# LPKG Release History
+
+## 25.10 System Release
+Release Date: October 2025
+
+### Cross Toolchain Packages
+- linux-headers 6.16.9
+- glibc 2.42  
+- binutils-pass-1 2.45
+- gcc-pass-1 15.2.0
+
+### Base System Packages
+- acl 2.3.2
+- attr 2.5.2
+- autoconf 2.72
+- automake 1.16.5
+- bash 5.2.21
+- bc 6.7.5
+- binutils 2.42
+- bison 3.8.2
+- bzip2 1.0.8
+- check 0.15.2
+- coreutils 9.4
+- dejagnu 1.6.3
+- diffutils 3.10
+- e2fsprogs 1.47.0
+- elfutils 0.190
+- expat 2.6.0
+- expect 5.45.4
+- file 5.45
+- findutils 4.9.0
+- flex 2.6.4
+- flit_core 3.9.0
+- gawk 5.3.0
+- gcc 13.2.0
+- gdbm 1.23
+- gettext 0.22.4
+- gmp 6.3.0
+- gperf 3.1
+- grep 3.11
+- groff 1.23.0
+- grub 2.12
+- gzip 1.13
+- iana-etc 20240125
+- inetutils 2.5
+- intltool 0.51.0
+- iproute2 6.7.0
+- jinja2 3.1.3
+- kbd 2.6.4
+- kmod 31
+- less 643
+- libcap 2.69
+- libffi 3.4.4
+- libpipeline 1.5.7
+- libtool 2.4.7
+- libxcrypt 4.4.36
+- m4 1.4.19
+- make 4.4.1
+- man-db 2.12.0
+- man-pages 6.06
+- markupsafe 2.1.5
+- meson 1.3.2
+- mpc 1.3.1
+- mpfr 4.2.1
+- ncurses 6.4
+- ninja 1.11.1
+- openssl 3.2.1
+- patch 2.7.6
+- perl 5.38.2
+- pkgconf 2.1.1
+- procps 4.0.4
+- psmisc 23.6
+- python 3.12.2
+- readline 8.2
+- sed 4.9
+- setuptools 69.1.0
+- shadow 4.14.5
+- sysklogd 1.5.1
+- systemd 255
+- sysvinit 3.08
+- tar 1.35
+- tcl 8.6.13
+- texinfo 7.1
+- tzdata 2024a
+- util-linux 2.39.3
+- vim 9.1.0041
+- wheel 0.42.0
+- xml-parser 2.47
+- xz 5.4.6
+- zlib 1.3.1
+- zstd 1.5.5

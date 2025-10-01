@@ -3,11 +3,10 @@ use crate::pkgs::by_name::bi::binutils::parser::{BinutilsInfo, fetch_page, parse
 use reqwest::Client;
 use std::{
     error::Error,
-    ffi::OsStr,
     path::{Path, PathBuf},
 };
 use tokio::process::Command;
-use tracing::{error, info, warn};
+use tracing::{info, warn};
 
 /// Configuration object - uses environment if values omitted.
 #[derive(Debug, Clone)]

@@ -148,6 +148,7 @@ fn main() -> Result<()> {
                         "variant": s.variant.clone(),
                         "status": s.status.clone(),
                         "path": s.relative_path.clone(),
+                        "tags": s.tags.clone(),
                     })
                 })
                 .collect();
@@ -326,6 +327,7 @@ struct PackageSummary {
     variant: Option<String>,
     status: String,
     relative_path: String,
+    tags: Vec<String>,
 }
 
 struct PackageRecord {
@@ -685,6 +687,10 @@ fn build_metadata_value(
         "status": {
             "state": status_state,
             "issues": issues,
+            "tags": vec![
+                "25.10".to_string(),
+                stage.unwrap_or("base-system").to_string()
+            ]
         }
     });
 

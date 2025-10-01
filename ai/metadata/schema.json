@@ -370,6 +370,24 @@
           "items": {
             "type": "string"
           }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "25.10",
+              "base-system",
+              "cross-toolchain",
+              "temporary-tools", 
+              "development",
+              "system-tools",
+              "networking",
+              "security",
+              "documentation",
+              "configuration"
+            ]
+          }
         }
       }
     }
