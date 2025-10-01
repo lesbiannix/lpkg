@@ -1,0 +1,147 @@
+{
+  "schema_version": "v0.1.0",
+  "package": {
+    "id": "mlfs/binutils/pass1",
+    "name": "Binutils",
+    "upstream": "gnu/binutils",
+    "version": "2.45",
+    "book": "mlfs",
+    "chapter": 5,
+    "section": "5.02",
+    "stage": "cross-toolchain",
+    "variant": "Pass 1",
+    "anchors": {
+      "section": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/binutils-pass1.html#ch-tools-binutils-pass1"
+    }
+  },
+  "source": {
+    "urls": [
+      {
+        "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.45.tar.xz",
+        "kind": "primary"
+      },
+      {
+        "url": "https://ftpmirror.gnu.org/binutils/binutils-2.45.tar.xz",
+        "kind": "mirror"
+      }
+    ],
+    "archive": "binutils-2.45.tar.xz"
+  },
+  "artifacts": {
+    "sbu": 1,
+    "disk": 678,
+    "install_prefix": "$LFS/tools"
+  },
+  "dependencies": {
+    "build": [
+      { "name": "bash" },
+      { "name": "coreutils" },
+      { "name": "gcc", "optional": true }
+    ],
+    "runtime": []
+  },
+  "environment": {
+    "variables": [
+      {
+        "name": "LFS",
+        "description": "Absolute path to mounted LFS workspace"
+      },
+      {
+        "name": "LFS_TGT",
+        "description": "Target triple for cross toolchain"
+      }
+    ],
+    "users": []
+  },
+  "build": [
+    {
+      "phase": "setup",
+      "commands": [
+        "tar -xf binutils-2.45.tar.xz",
+        "cd binutils-2.45",
+        "mkdir -v build",
+        "cd build"
+      ]
+    },
+    {
+      "phase": "configure",
+      "commands": [
+        "../configure --prefix=$LFS/tools \\",
+        "             --with-sysroot=$LFS \\",
+        "             --target=$LFS_TGT   \\",
+        "             --disable-nls       \\",
+        "             --enable-gprofng=no \\",
+        "             --disable-werror    \\",
+        "             --enable-new-dtags  \\",
+        "             --enable-default-hash-style=gnu"
+      ],
+      "cwd": "build"
+    },
+    {
+      "phase": "build",
+      "commands": [
+        "make"
+      ],
+      "cwd": "build"
+    },
+    {
+      "phase": "test",
+      "commands": [
+        "make -k check"
+      ],
+      "cwd": "build",
+      "notes": "Tests are optional for cross-toolchain; failures can be ignored"
+    },
+    {
+      "phase": "install",
+      "commands": [
+        "make install"
+      ],
+      "cwd": "build"
+    }
+  ],
+  "optimizations": {
+    "enable_lto": true,
+    "enable_pgo": true,
+    "cflags": ["-O3", "-flto", "-fprofile-generate"],
+    "ldflags": ["-flto", "-fprofile-generate"],
+    "profdata": null
+  },
+  "tests": [
+    {
+      "commands": [
+        "make -k check"
+      ],
+      "optional": true,
+      "expected_failures": ["gas/run/elf-x86-64-reloc.sh"]
+    }
+  ],
+  "post_install": [
+    {
+      "commands": [
+        "rm -v $LFS/tools/lib/libbfd.a",
+        "rm -v $LFS/tools/lib/libctf-nobfd.a"
+      ],
+      "description": "Remove static libraries per LFS guidance"
+    }
+  ],
+  "notes": [
+    {
+      "severity": "warning",
+      "text": "Ensure the host uses recent flex/bison to avoid configure warnings."
+    }
+  ],
+  "provenance": {
+    "book_release": "ml-12.4-40-multilib",
+    "page_url": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/binutils-pass1.html",
+    "retrieved_at": "2025-03-09T00:00:00Z",
+    "content_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "status": {
+    "state": "draft",
+    "issues": [
+      "Checksums not yet verified",
+      "Dependency list requires confirmation"
+    ]
+  }
+}

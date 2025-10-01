@@ -1,0 +1,56 @@
+{
+  "generated_at": "2025-03-09T00:00:00Z",
+  "unfinished": [
+    {
+      "id": "mlfs-package-import",
+      "title": "Import all MLFS packages into lpkg",
+      "description": "Parse the Multilib LFS book and scaffold package definitions with optimization defaults (LTO/PGO/-O3).",
+      "blocked_on": [
+        "Implement automated parser"
+      ],
+      "owner": "mlfs_researcher"
+    },
+    {
+      "id": "pgo-integration",
+      "title": "Integrate profile guided optimization support",
+      "description": "Add infrastructure for collection and replay of profiling data during package builds.",
+      "blocked_on": [
+        "Decide on profiling workload definitions"
+      ],
+      "owner": "default_cli"
+    },
+    {
+      "id": "lfs-html-parsers",
+      "title": "Automate LFS/BLFS/GLFS ingest via HTML parsing",
+      "description": "Avoid hardcoded package data; download the upstream books (LFS, BLFS, GLFS) and parse them to drive scaffolding and metadata updates.",
+      "blocked_on": [
+        "Design resilient scraping strategies for each book",
+        "Implement incremental update workflow"
+      ],
+      "owner": "mlfs_researcher"
+    }
+  ],
+  "solved": [
+    {
+      "id": "ai-metadata-store",
+      "title": "Create AI metadata directory",
+      "description": "Introduce ai/personas.json, ai/tasks.json, ai/bugs.json for persistent assistant context.",
+      "resolution": "Initial JSON files checked in with placeholder content.",
+      "owner": "default_cli"
+    },
+    {
+      "id": "metadata-schema-v0.1",
+      "title": "Define package metadata schema",
+      "description": "Specify JSON schema and layout for storing scraped package detail from LFS family books.",
+      "resolution": "Added ai/metadata/schema.json with v0.1.0 structure and seeded initial package entry/index.",
+      "owner": "default_cli"
+    },
+    {
+      "id": "metadata-indexer-cli",
+      "title": "Build metadata validation/indexing tool",
+      "description": "Provide a standalone CLI to validate package metadata against the schema and regenerate ai/metadata/index.json.",
+      "resolution": "Added src/bin/metadata_indexer.rs with schema validation, summary extraction, and index writer integration.",
+      "owner": "default_cli"
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 use crate::tui::disk_manager::DiskManager;
 use crossterm::event::{self, Event, KeyCode};
 use std::error::Error;
-use std::io::Stdout;
 use tui::{
     Terminal,
     backend::CrosstermBackend,
@@ -11,7 +10,7 @@ use tui::{
 };
 
 pub fn show_main_menu() -> Result<(), Box<dyn Error>> {
-    let mut stdout = std::io::stdout();
+    let stdout = std::io::stdout();
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
@@ -37,7 +36,7 @@ pub fn show_main_menu() -> Result<(), Box<dyn Error>> {
         if event::poll(std::time::Duration::from_millis(100))? {
             if let Event::Key(key) = event::read()? {
                 match key.code {
-                    KeyCode::Char('1') => DiskManager::show_disk_manager(&mut terminal)?,
+                    KeyCode::Char('1') => DiskManager::run_tui()?,
                     KeyCode::Char('0') => break,
                     _ => {}
                 }

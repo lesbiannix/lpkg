@@ -18,9 +18,9 @@ impl Theme {
 }
 
 impl Settings {
-    #[instrument(skip(terminal))]
+    #[instrument(skip(_terminal))]
     pub fn show_settings(
-        terminal: &mut Terminal<CrosstermBackend<Stdout>>,
+        _terminal: &mut Terminal<CrosstermBackend<Stdout>>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         // Render settings UI here
         Ok(())

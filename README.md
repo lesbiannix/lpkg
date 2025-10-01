@@ -94,10 +94,43 @@ You can also run the project directly in the flake shell:
 nix run
 ```
 
+### AI metadata tooling
+
+The AI metadata store under `ai/metadata/` comes with a helper CLI to
+validate package records against the JSON schema and regenerate
+`index.json` after adding new entries:
+
+```bash
+cargo run --bin metadata_indexer -- --base-dir . validate
+cargo run --bin metadata_indexer -- --base-dir . index
+```
+
+Use `--compact` with `index` if you prefer single-line JSON output.
+
+To draft metadata for a specific book page, you can run the harvest mode.
+It fetches the XHTML, scrapes the build commands, and emits a schema-
+compliant JSON skeleton (pass `--dry-run` to inspect the result without
+writing to disk):
+
+```bash
+cargo run --bin metadata_indexer -- \
+  --base-dir . harvest \
+  --book mlfs \
+  --page chapter05/binutils-pass1 \
+  --dry-run
+```
+
+## 📚 Documentation
+
+- [Architecture Overview](docs/ARCHITECTURE.md) – high-level tour of the crate
+  layout, binaries, and supporting modules.
+- [Metadata Harvesting Pipeline](docs/METADATA_PIPELINE.md) – how the metadata
+  indexer produces and validates the JSON records under `ai/metadata/`.
+- `ai/notes.md` – scratchpad for ongoing research tasks (e.g., deeper jhalfs
+  integration).
+
 ---
 
 ## 📄 License
 
 LPKG is licensed under the [MIT License](LICENSE).
-
-

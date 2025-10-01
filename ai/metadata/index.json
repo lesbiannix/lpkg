@@ -1,0 +1,16 @@
+{
+  "generated_at": "2025-10-01T04:35:27.106227+00:00",
+  "packages": [
+    {
+      "book": "mlfs",
+      "id": "mlfs/binutils/pass1",
+      "name": "Binutils",
+      "path": "packages/mlfs/binutils-pass1.json",
+      "stage": "cross-toolchain",
+      "status": "draft",
+      "variant": "Pass 1",
+      "version": "2.45"
+    }
+  ],
+  "schema_version": "v0.1.0"
+}

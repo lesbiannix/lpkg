@@ -1,2 +1,12 @@
+pub mod ai;
+pub mod db;
+pub mod html;
+pub mod ingest;
+pub mod md5_utils;
+pub mod mirrors;
 pub mod pkgs;
+pub mod version_check;
+pub mod wget_list;
+
+#[cfg(feature = "tui")]
 pub mod tui;

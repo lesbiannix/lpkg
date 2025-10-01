@@ -1,0 +1,113 @@
+{
+  "artifacts": {
+    "disk": 678,
+    "install_prefix": null,
+    "sbu": 1.0
+  },
+  "build": [
+    {
+      "commands": [
+        "mkdir -v build",
+        "cd       build"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "setup",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "../configure --prefix=$LFS/tools \\",
+        "--with-sysroot=$LFS \\",
+        "--target=$LFS_TGT   \\",
+        "--disable-nls       \\",
+        "--enable-gprofng=no \\",
+        "--disable-werror    \\",
+        "--enable-new-dtags  \\",
+        "--enable-default-hash-style=gnu"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "configure",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make install"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "install",
+      "requires_root": false
+    }
+  ],
+  "dependencies": {
+    "build": [],
+    "runtime": []
+  },
+  "environment": {
+    "users": [],
+    "variables": []
+  },
+  "optimizations": {
+    "cflags": [
+      "-O3",
+      "-flto"
+    ],
+    "enable_lto": true,
+    "enable_pgo": true,
+    "ldflags": [
+      "-flto"
+    ],
+    "profdata": null
+  },
+  "package": {
+    "anchors": {
+      "section": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/binutils-pass1.html#ch-tools-binutils-pass1"
+    },
+    "book": "mlfs",
+    "chapter": 5,
+    "id": "mlfs/binutils-pass-1",
+    "name": "Binutils",
+    "section": "5.2",
+    "stage": "cross-toolchain",
+    "upstream": null,
+    "variant": "Pass 1",
+    "version": "2.45"
+  },
+  "provenance": {
+    "book_release": "lfs-ml-12.4-40-multilib",
+    "content_hash": "7c580aad04933a2f6ec5e5410a57695dd2d0b76a293212f33fd3edd226490853",
+    "page_url": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/binutils-pass1.html",
+    "retrieved_at": "2025-10-01T04:57:22.375928+00:00"
+  },
+  "schema_version": "v0.1.0",
+  "source": {
+    "archive": "binutils-2.45.tar.xz",
+    "checksums": [
+      {
+        "alg": "md5",
+        "value": "dee5b4267e0305a99a3c9d6131f45759"
+      }
+    ],
+    "urls": [
+      {
+        "kind": "primary",
+        "url": "https://sourceware.org/pub/binutils/releases/binutils-2.45.tar.xz"
+      }
+    ]
+  },
+  "status": {
+    "issues": [],
+    "state": "draft"
+  }
+}

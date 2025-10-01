@@ -1,7 +1,7 @@
 // src/tui/disk_manager.rs
 use std::{
     fs::{File, read_dir},
-    io::{self, Seek, SeekFrom, Write},
+    io::{self, Seek, SeekFrom},
     path::PathBuf,
 };
 
@@ -186,12 +186,12 @@ impl DiskManager {
             },
         };
 
-        // Create list of lines to display:
+        // Create list of lines to display using public GPT API:
         let mut lines: Vec<String> = Vec::new();
         lines.push(format!("Partitions on {}:", disk.display()));
-        for (i, entry_opt) in gpt.partitions.iter().enumerate() {
-            if let Some(entry) = entry_opt {
-                let name = entry.partition_name.to_string();
+        for (i, entry) in gpt.iter() {
+            if entry.is_used() {
+                let name = entry.partition_name.as_str();
                 lines.push(format!(
                     "{}: {} -> {}  (type: {})",
                     i,
@@ -388,9 +388,9 @@ impl DiskManager {
         let sectors = (size_mb as u128 * 1024 * 1024 / 512) as u64;
         // choose starting LBA: find max ending_lba among existing partitions; align to 2048
         let last_end = gpt
-            .partitions
             .iter()
-            .filter_map(|p| p.as_ref().map(|e| e.ending_lba))
+            .filter(|(_, e)| e.is_used())
+            .map(|(_, e)| e.ending_lba)
             .max()
             .unwrap_or(2048);
         let start = ((last_end + 2048) / 2048) * 2048 + 1;
@@ -410,15 +410,15 @@ impl DiskManager {
         };
         new_entry.partition_type_guid = type_guid;
 
-        // find first empty partition slot
-        let idx_opt = gpt.partitions.iter().position(|p| p.is_none());
+        // find first empty partition slot (indexing is 1-based for gptman::GPT)
+        let idx_opt = gpt.iter().find(|(_, e)| e.is_unused()).map(|(i, _)| i);
         let idx = match idx_opt {
             Some(i) => i,
             None => return Err("No free GPT partition entries (maxed out)".into()),
         };
 
         // assign and write
-        gpt.partitions[idx] = Some(new_entry);
+        gpt[idx] = new_entry;
 
         // Seek to start (important)
         file.seek(SeekFrom::Start(0))?;

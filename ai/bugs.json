@@ -1,0 +1,29 @@
+[
+  {
+    "id": "disk-manager-private-fields",
+    "title": "Disk manager accesses private GPT fields",
+    "description": "src/tui/disk_manager.rs reaches into gptman::GPT::partitions which is private, breaking compilation.",
+    "status": "open",
+    "owner": "default_cli",
+    "created_at": "2025-03-09T00:00:00Z",
+    "labels": ["tui", "blocking-build"]
+  },
+  {
+    "id": "tui-feature-build",
+    "title": "TUI modules require crossterm feature gating",
+    "description": "When the crate is built without the `tui` feature the main binary still imports crossterm types and fails to compile.",
+    "status": "open",
+    "owner": "default_cli",
+    "created_at": "2025-03-09T00:00:00Z",
+    "labels": ["tui", "feature-gate"]
+  },
+  {
+    "id": "metadata-harvest-no-source-urls",
+    "title": "Harvested metadata missing source URLs",
+    "description": "`metadata_indexer harvest --book mlfs --page chapter05/binutils-pass1 --dry-run` emits a draft record with no source URLs even after wget-list fallback; Binutils tarball discovery logic needs to inspect package download tables or improve slug matching.",
+    "status": "open",
+    "owner": "default_cli",
+    "created_at": "2025-10-01T04:40:00Z",
+    "labels": ["metadata", "ingest", "mlfs"]
+  }
+]

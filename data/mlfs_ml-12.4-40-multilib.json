@@ -1,0 +1,1019 @@
+[
+  {
+    "chapter": 5,
+    "name": "binutils",
+    "notes": null,
+    "section": "Binutils-2.45 - Pass 1",
+    "stage": "cross-toolchain",
+    "variant": "pass1",
+    "version": "2.45"
+  },
+  {
+    "chapter": 5,
+    "name": "gcc",
+    "notes": null,
+    "section": "GCC-15.2.0 - Pass 1",
+    "stage": "cross-toolchain",
+    "variant": "pass1",
+    "version": "15.2.0"
+  },
+  {
+    "chapter": 5,
+    "name": "linux-api-headers",
+    "notes": null,
+    "section": "Linux-6.16.9 API Headers",
+    "stage": "cross-toolchain",
+    "variant": null,
+    "version": "6.16.9"
+  },
+  {
+    "chapter": 5,
+    "name": "glibc",
+    "notes": "Temporary toolchain",
+    "section": "Glibc-2.42",
+    "stage": "cross-toolchain",
+    "variant": null,
+    "version": "2.42"
+  },
+  {
+    "chapter": 5,
+    "name": "libstdc++",
+    "notes": null,
+    "section": "Libstdc++ from GCC-15.2.0",
+    "stage": "cross-toolchain",
+    "variant": null,
+    "version": "15.2.0"
+  },
+  {
+    "chapter": 6,
+    "name": "m4",
+    "notes": null,
+    "section": "M4-1.4.20",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "1.4.20"
+  },
+  {
+    "chapter": 6,
+    "name": "ncurses",
+    "notes": null,
+    "section": "Ncurses-6.5-20250809",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "6.5-20250809"
+  },
+  {
+    "chapter": 6,
+    "name": "bash",
+    "notes": null,
+    "section": "Bash-5.3",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "5.3"
+  },
+  {
+    "chapter": 6,
+    "name": "coreutils",
+    "notes": null,
+    "section": "Coreutils-9.8",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "9.8"
+  },
+  {
+    "chapter": 6,
+    "name": "diffutils",
+    "notes": null,
+    "section": "Diffutils-3.12",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "3.12"
+  },
+  {
+    "chapter": 6,
+    "name": "file",
+    "notes": null,
+    "section": "File-5.46",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "5.46"
+  },
+  {
+    "chapter": 6,
+    "name": "findutils",
+    "notes": null,
+    "section": "Findutils-4.10.0",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "4.10.0"
+  },
+  {
+    "chapter": 6,
+    "name": "gawk",
+    "notes": null,
+    "section": "Gawk-5.3.2",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "5.3.2"
+  },
+  {
+    "chapter": 6,
+    "name": "grep",
+    "notes": null,
+    "section": "Grep-3.12",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "3.12"
+  },
+  {
+    "chapter": 6,
+    "name": "gzip",
+    "notes": null,
+    "section": "Gzip-1.14",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "1.14"
+  },
+  {
+    "chapter": 6,
+    "name": "make",
+    "notes": null,
+    "section": "Make-4.4.1",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "4.4.1"
+  },
+  {
+    "chapter": 6,
+    "name": "patch",
+    "notes": null,
+    "section": "Patch-2.8",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "2.8"
+  },
+  {
+    "chapter": 6,
+    "name": "sed",
+    "notes": null,
+    "section": "Sed-4.9",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "4.9"
+  },
+  {
+    "chapter": 6,
+    "name": "tar",
+    "notes": null,
+    "section": "Tar-1.35",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "1.35"
+  },
+  {
+    "chapter": 6,
+    "name": "xz",
+    "notes": null,
+    "section": "Xz-5.8.1",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "5.8.1"
+  },
+  {
+    "chapter": 6,
+    "name": "binutils",
+    "notes": null,
+    "section": "Binutils-2.45 - Pass 2",
+    "stage": "temporary-tools",
+    "variant": "pass2",
+    "version": "2.45"
+  },
+  {
+    "chapter": 6,
+    "name": "gcc",
+    "notes": null,
+    "section": "GCC-15.2.0 - Pass 2",
+    "stage": "temporary-tools",
+    "variant": "pass2",
+    "version": "15.2.0"
+  },
+  {
+    "chapter": 7,
+    "name": "gettext",
+    "notes": null,
+    "section": "Gettext-0.26",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "0.26"
+  },
+  {
+    "chapter": 7,
+    "name": "bison",
+    "notes": null,
+    "section": "Bison-3.8.2",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "3.8.2"
+  },
+  {
+    "chapter": 7,
+    "name": "perl",
+    "notes": null,
+    "section": "Perl-5.42.0",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "5.42.0"
+  },
+  {
+    "chapter": 7,
+    "name": "python",
+    "notes": null,
+    "section": "Python-3.13.7",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "3.13.7"
+  },
+  {
+    "chapter": 7,
+    "name": "texinfo",
+    "notes": null,
+    "section": "Texinfo-7.2",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "7.2"
+  },
+  {
+    "chapter": 7,
+    "name": "util-linux",
+    "notes": null,
+    "section": "Util-linux-2.41.2",
+    "stage": "temporary-tools",
+    "variant": null,
+    "version": "2.41.2"
+  },
+  {
+    "chapter": 8,
+    "name": "man-pages",
+    "notes": null,
+    "section": "Man-pages-6.15",
+    "stage": "system",
+    "variant": null,
+    "version": "6.15"
+  },
+  {
+    "chapter": 8,
+    "name": "iana-etc",
+    "notes": null,
+    "section": "Iana-Etc-20250926",
+    "stage": "system",
+    "variant": null,
+    "version": "20250926"
+  },
+  {
+    "chapter": 8,
+    "name": "glibc",
+    "notes": null,
+    "section": "Glibc-2.42",
+    "stage": "system",
+    "variant": null,
+    "version": "2.42"
+  },
+  {
+    "chapter": 8,
+    "name": "zlib",
+    "notes": null,
+    "section": "Zlib-1.3.1",
+    "stage": "system",
+    "variant": null,
+    "version": "1.3.1"
+  },
+  {
+    "chapter": 8,
+    "name": "bzip2",
+    "notes": null,
+    "section": "Bzip2-1.0.8",
+    "stage": "system",
+    "variant": null,
+    "version": "1.0.8"
+  },
+  {
+    "chapter": 8,
+    "name": "xz",
+    "notes": null,
+    "section": "Xz-5.8.1",
+    "stage": "system",
+    "variant": null,
+    "version": "5.8.1"
+  },
+  {
+    "chapter": 8,
+    "name": "lz4",
+    "notes": null,
+    "section": "Lz4-1.10.0",
+    "stage": "system",
+    "variant": null,
+    "version": "1.10.0"
+  },
+  {
+    "chapter": 8,
+    "name": "zstd",
+    "notes": null,
+    "section": "Zstd-1.5.7",
+    "stage": "system",
+    "variant": null,
+    "version": "1.5.7"
+  },
+  {
+    "chapter": 8,
+    "name": "file",
+    "notes": null,
+    "section": "File-5.46",
+    "stage": "system",
+    "variant": null,
+    "version": "5.46"
+  },
+  {
+    "chapter": 8,
+    "name": "readline",
+    "notes": null,
+    "section": "Readline-8.3",
+    "stage": "system",
+    "variant": null,
+    "version": "8.3"
+  },
+  {
+    "chapter": 8,
+    "name": "pcre2",
+    "notes": null,
+    "section": "Pcre2-10.46",
+    "stage": "system",
+    "variant": null,
+    "version": "10.46"
+  },
+  {
+    "chapter": 8,
+    "name": "m4",
+    "notes": null,
+    "section": "M4-1.4.20",
+    "stage": "system",
+    "variant": null,
+    "version": "1.4.20"
+  },
+  {
+    "chapter": 8,
+    "name": "bc",
+    "notes": null,
+    "section": "Bc-7.0.3",
+    "stage": "system",
+    "variant": null,
+    "version": "7.0.3"
+  },
+  {
+    "chapter": 8,
+    "name": "flex",
+    "notes": null,
+    "section": "Flex-2.6.4",
+    "stage": "system",
+    "variant": null,
+    "version": "2.6.4"
+  },
+  {
+    "chapter": 8,
+    "name": "tcl",
+    "notes": null,
+    "section": "Tcl-8.6.17",
+    "stage": "system",
+    "variant": null,
+    "version": "8.6.17"
+  },
+  {
+    "chapter": 8,
+    "name": "expect",
+    "notes": null,
+    "section": "Expect-5.45.4",
+    "stage": "system",
+    "variant": null,
+    "version": "5.45.4"
+  },
+  {
+    "chapter": 8,
+    "name": "dejagnu",
+    "notes": null,
+    "section": "DejaGNU-1.6.3",
+    "stage": "system",
+    "variant": null,
+    "version": "1.6.3"
+  },
+  {
+    "chapter": 8,
+    "name": "pkgconf",
+    "notes": null,
+    "section": "Pkgconf-2.5.1",
+    "stage": "system",
+    "variant": null,
+    "version": "2.5.1"
+  },
+  {
+    "chapter": 8,
+    "name": "binutils",
+    "notes": null,
+    "section": "Binutils-2.45",
+    "stage": "system",
+    "variant": null,
+    "version": "2.45"
+  },
+  {
+    "chapter": 8,
+    "name": "gmp",
+    "notes": null,
+    "section": "GMP-6.3.0",
+    "stage": "system",
+    "variant": null,
+    "version": "6.3.0"
+  },
+  {
+    "chapter": 8,
+    "name": "mpfr",
+    "notes": null,
+    "section": "MPFR-4.2.2",
+    "stage": "system",
+    "variant": null,
+    "version": "4.2.2"
+  },
+  {
+    "chapter": 8,
+    "name": "mpc",
+    "notes": null,
+    "section": "MPC-1.3.1",
+    "stage": "system",
+    "variant": null,
+    "version": "1.3.1"
+  },
+  {
+    "chapter": 8,
+    "name": "isl",
+    "notes": null,
+    "section": "ISL-0.27",
+    "stage": "system",
+    "variant": null,
+    "version": "0.27"
+  },
+  {
+    "chapter": 8,
+    "name": "attr",
+    "notes": null,
+    "section": "Attr-2.5.2",
+    "stage": "system",
+    "variant": null,
+    "version": "2.5.2"
+  },
+  {
+    "chapter": 8,
+    "name": "acl",
+    "notes": null,
+    "section": "Acl-2.3.2",
+    "stage": "system",
+    "variant": null,
+    "version": "2.3.2"
+  },
+  {
+    "chapter": 8,
+    "name": "libcap",
+    "notes": null,
+    "section": "Libcap-2.76",
+    "stage": "system",
+    "variant": null,
+    "version": "2.76"
+  },
+  {
+    "chapter": 8,
+    "name": "libxcrypt",
+    "notes": null,
+    "section": "Libxcrypt-4.4.38",
+    "stage": "system",
+    "variant": null,
+    "version": "4.4.38"
+  },
+  {
+    "chapter": 8,
+    "name": "shadow",
+    "notes": null,
+    "section": "Shadow-4.18.0",
+    "stage": "system",
+    "variant": null,
+    "version": "4.18.0"
+  },
+  {
+    "chapter": 8,
+    "name": "gcc",
+    "notes": null,
+    "section": "GCC-15.2.0",
+    "stage": "system",
+    "variant": null,
+    "version": "15.2.0"
+  },
+  {
+    "chapter": 8,
+    "name": "ncurses",
+    "notes": null,
+    "section": "Ncurses-6.5-20250809",
+    "stage": "system",
+    "variant": null,
+    "version": "6.5-20250809"
+  },
+  {
+    "chapter": 8,
+    "name": "sed",
+    "notes": null,
+    "section": "Sed-4.9",
+    "stage": "system",
+    "variant": null,
+    "version": "4.9"
+  },
+  {
+    "chapter": 8,
+    "name": "psmisc",
+    "notes": null,
+    "section": "Psmisc-23.7",
+    "stage": "system",
+    "variant": null,
+    "version": "23.7"
+  },
+  {
+    "chapter": 8,
+    "name": "gettext",
+    "notes": null,
+    "section": "Gettext-0.26",
+    "stage": "system",
+    "variant": null,
+    "version": "0.26"
+  },
+  {
+    "chapter": 8,
+    "name": "bison",
+    "notes": null,
+    "section": "Bison-3.8.2",
+    "stage": "system",
+    "variant": null,
+    "version": "3.8.2"
+  },
+  {
+    "chapter": 8,
+    "name": "grep",
+    "notes": null,
+    "section": "Grep-3.12",
+    "stage": "system",
+    "variant": null,
+    "version": "3.12"
+  },
+  {
+    "chapter": 8,
+    "name": "bash",
+    "notes": null,
+    "section": "Bash-5.3",
+    "stage": "system",
+    "variant": null,
+    "version": "5.3"
+  },
+  {
+    "chapter": 8,
+    "name": "libtool",
+    "notes": null,
+    "section": "Libtool-2.5.4",
+    "stage": "system",
+    "variant": null,
+    "version": "2.5.4"
+  },
+  {
+    "chapter": 8,
+    "name": "gdbm",
+    "notes": null,
+    "section": "GDBM-1.26",
+    "stage": "system",
+    "variant": null,
+    "version": "1.26"
+  },
+  {
+    "chapter": 8,
+    "name": "gperf",
+    "notes": null,
+    "section": "Gperf-3.3",
+    "stage": "system",
+    "variant": null,
+    "version": "3.3"
+  },
+  {
+    "chapter": 8,
+    "name": "expat",
+    "notes": null,
+    "section": "Expat-2.7.3",
+    "stage": "system",
+    "variant": null,
+    "version": "2.7.3"
+  },
+  {
+    "chapter": 8,
+    "name": "inetutils",
+    "notes": null,
+    "section": "Inetutils-2.6",
+    "stage": "system",
+    "variant": null,
+    "version": "2.6"
+  },
+  {
+    "chapter": 8,
+    "name": "less",
+    "notes": null,
+    "section": "Less-679",
+    "stage": "system",
+    "variant": null,
+    "version": "679"
+  },
+  {
+    "chapter": 8,
+    "name": "perl",
+    "notes": null,
+    "section": "Perl-5.42.0",
+    "stage": "system",
+    "variant": null,
+    "version": "5.42.0"
+  },
+  {
+    "chapter": 8,
+    "name": "xml-parser",
+    "notes": null,
+    "section": "XML::Parser-2.47",
+    "stage": "system",
+    "variant": null,
+    "version": "2.47"
+  },
+  {
+    "chapter": 8,
+    "name": "intltool",
+    "notes": null,
+    "section": "Intltool-0.51.0",
+    "stage": "system",
+    "variant": null,
+    "version": "0.51.0"
+  },
+  {
+    "chapter": 8,
+    "name": "autoconf",
+    "notes": null,
+    "section": "Autoconf-2.72",
+    "stage": "system",
+    "variant": null,
+    "version": "2.72"
+  },
+  {
+    "chapter": 8,
+    "name": "automake",
+    "notes": null,
+    "section": "Automake-1.18.1",
+    "stage": "system",
+    "variant": null,
+    "version": "1.18.1"
+  },
+  {
+    "chapter": 8,
+    "name": "openssl",
+    "notes": null,
+    "section": "OpenSSL-3.5.3",
+    "stage": "system",
+    "variant": null,
+    "version": "3.5.3"
+  },
+  {
+    "chapter": 8,
+    "name": "elfutils-libelf",
+    "notes": null,
+    "section": "Libelf from Elfutils-0.193",
+    "stage": "system",
+    "variant": null,
+    "version": "0.193"
+  },
+  {
+    "chapter": 8,
+    "name": "libffi",
+    "notes": null,
+    "section": "Libffi-3.5.2",
+    "stage": "system",
+    "variant": null,
+    "version": "3.5.2"
+  },
+  {
+    "chapter": 8,
+    "name": "sqlite",
+    "notes": null,
+    "section": "Sqlite-3500400",
+    "stage": "system",
+    "variant": null,
+    "version": "3500400"
+  },
+  {
+    "chapter": 8,
+    "name": "python",
+    "notes": null,
+    "section": "Python-3.13.7",
+    "stage": "system",
+    "variant": null,
+    "version": "3.13.7"
+  },
+  {
+    "chapter": 8,
+    "name": "flit-core",
+    "notes": null,
+    "section": "Flit-Core-3.12.0",
+    "stage": "system",
+    "variant": null,
+    "version": "3.12.0"
+  },
+  {
+    "chapter": 8,
+    "name": "packaging",
+    "notes": null,
+    "section": "Packaging-25.0",
+    "stage": "system",
+    "variant": null,
+    "version": "25.0"
+  },
+  {
+    "chapter": 8,
+    "name": "wheel",
+    "notes": null,
+    "section": "Wheel-0.46.1",
+    "stage": "system",
+    "variant": null,
+    "version": "0.46.1"
+  },
+  {
+    "chapter": 8,
+    "name": "setuptools",
+    "notes": null,
+    "section": "Setuptools-80.9.0",
+    "stage": "system",
+    "variant": null,
+    "version": "80.9.0"
+  },
+  {
+    "chapter": 8,
+    "name": "ninja",
+    "notes": null,
+    "section": "Ninja-1.13.1",
+    "stage": "system",
+    "variant": null,
+    "version": "1.13.1"
+  },
+  {
+    "chapter": 8,
+    "name": "meson",
+    "notes": null,
+    "section": "Meson-1.9.1",
+    "stage": "system",
+    "variant": null,
+    "version": "1.9.1"
+  },
+  {
+    "chapter": 8,
+    "name": "kmod",
+    "notes": null,
+    "section": "Kmod-34.2",
+    "stage": "system",
+    "variant": null,
+    "version": "34.2"
+  },
+  {
+    "chapter": 8,
+    "name": "coreutils",
+    "notes": null,
+    "section": "Coreutils-9.8",
+    "stage": "system",
+    "variant": null,
+    "version": "9.8"
+  },
+  {
+    "chapter": 8,
+    "name": "diffutils",
+    "notes": null,
+    "section": "Diffutils-3.12",
+    "stage": "system",
+    "variant": null,
+    "version": "3.12"
+  },
+  {
+    "chapter": 8,
+    "name": "gawk",
+    "notes": null,
+    "section": "Gawk-5.3.2",
+    "stage": "system",
+    "variant": null,
+    "version": "5.3.2"
+  },
+  {
+    "chapter": 8,
+    "name": "findutils",
+    "notes": null,
+    "section": "Findutils-4.10.0",
+    "stage": "system",
+    "variant": null,
+    "version": "4.10.0"
+  },
+  {
+    "chapter": 8,
+    "name": "groff",
+    "notes": null,
+    "section": "Groff-1.23.0",
+    "stage": "system",
+    "variant": null,
+    "version": "1.23.0"
+  },
+  {
+    "chapter": 8,
+    "name": "grub",
+    "notes": null,
+    "section": "GRUB-2.12",
+    "stage": "system",
+    "variant": null,
+    "version": "2.12"
+  },
+  {
+    "chapter": 8,
+    "name": "gzip",
+    "notes": null,
+    "section": "Gzip-1.14",
+    "stage": "system",
+    "variant": null,
+    "version": "1.14"
+  },
+  {
+    "chapter": 8,
+    "name": "iproute2",
+    "notes": null,
+    "section": "IPRoute2-6.16.0",
+    "stage": "system",
+    "variant": null,
+    "version": "6.16.0"
+  },
+  {
+    "chapter": 8,
+    "name": "kbd",
+    "notes": null,
+    "section": "Kbd-2.9.0",
+    "stage": "system",
+    "variant": null,
+    "version": "2.9.0"
+  },
+  {
+    "chapter": 8,
+    "name": "libpipeline",
+    "notes": null,
+    "section": "Libpipeline-1.5.8",
+    "stage": "system",
+    "variant": null,
+    "version": "1.5.8"
+  },
+  {
+    "chapter": 8,
+    "name": "make",
+    "notes": null,
+    "section": "Make-4.4.1",
+    "stage": "system",
+    "variant": null,
+    "version": "4.4.1"
+  },
+  {
+    "chapter": 8,
+    "name": "patch",
+    "notes": null,
+    "section": "Patch-2.8",
+    "stage": "system",
+    "variant": null,
+    "version": "2.8"
+  },
+  {
+    "chapter": 8,
+    "name": "tar",
+    "notes": null,
+    "section": "Tar-1.35",
+    "stage": "system",
+    "variant": null,
+    "version": "1.35"
+  },
+  {
+    "chapter": 8,
+    "name": "texinfo",
+    "notes": null,
+    "section": "Texinfo-7.2",
+    "stage": "system",
+    "variant": null,
+    "version": "7.2"
+  },
+  {
+    "chapter": 8,
+    "name": "vim",
+    "notes": null,
+    "section": "Vim-9.1.1806",
+    "stage": "system",
+    "variant": null,
+    "version": "9.1.1806"
+  },
+  {
+    "chapter": 8,
+    "name": "markupsafe",
+    "notes": null,
+    "section": "MarkupSafe-3.0.3",
+    "stage": "system",
+    "variant": null,
+    "version": "3.0.3"
+  },
+  {
+    "chapter": 8,
+    "name": "jinja2",
+    "notes": null,
+    "section": "Jinja2-3.1.6",
+    "stage": "system",
+    "variant": null,
+    "version": "3.1.6"
+  },
+  {
+    "chapter": 8,
+    "name": "systemd-udev",
+    "notes": null,
+    "section": "Udev from Systemd-257.8",
+    "stage": "system",
+    "variant": null,
+    "version": "257.8"
+  },
+  {
+    "chapter": 8,
+    "name": "man-db",
+    "notes": null,
+    "section": "Man-DB-2.13.1",
+    "stage": "system",
+    "variant": null,
+    "version": "2.13.1"
+  },
+  {
+    "chapter": 8,
+    "name": "procps-ng",
+    "notes": null,
+    "section": "Procps-ng-4.0.5",
+    "stage": "system",
+    "variant": null,
+    "version": "4.0.5"
+  },
+  {
+    "chapter": 8,
+    "name": "util-linux",
+    "notes": null,
+    "section": "Util-linux-2.41.2",
+    "stage": "system",
+    "variant": null,
+    "version": "2.41.2"
+  },
+  {
+    "chapter": 8,
+    "name": "e2fsprogs",
+    "notes": null,
+    "section": "E2fsprogs-1.47.3",
+    "stage": "system",
+    "variant": null,
+    "version": "1.47.3"
+  },
+  {
+    "chapter": 8,
+    "name": "sysklogd",
+    "notes": null,
+    "section": "Sysklogd-2.7.2",
+    "stage": "system",
+    "variant": null,
+    "version": "2.7.2"
+  },
+  {
+    "chapter": 8,
+    "name": "sysvinit",
+    "notes": null,
+    "section": "SysVinit-3.14",
+    "stage": "system",
+    "variant": null,
+    "version": "3.14"
+  },
+  {
+    "chapter": 9,
+    "name": "lfs-bootscripts",
+    "notes": null,
+    "section": "LFS-Bootscripts-20250827",
+    "stage": "system",
+    "variant": null,
+    "version": "20250827"
+  },
+  {
+    "chapter": 10,
+    "name": "linux",
+    "notes": "Final kernel build",
+    "section": "Linux-6.16.9",
+    "stage": "system",
+    "variant": null,
+    "version": "6.16.9"
+  }
+]
