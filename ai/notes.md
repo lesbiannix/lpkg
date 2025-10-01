@@ -44,3 +44,56 @@ Open questions:
 - How to represent optional post-install steps or multi-phase builds inside the
   generated module (additional helper functions vs. raw command arrays).
 - Where to store PGO workload hints once the PGO infrastructure is defined.
+
+# Lightweight Networking Rewrite
+
+- Motivation: remove heavy async stacks (tokio + reqwest) from the default
+  feature set to keep clean builds fast and reduce binary size.
+- HTTP stack baseline: [`ureq`](https://github.com/algesten/ureq) (blocking,
+  TLS via rustls, small dependency footprint) plus `scraper` for DOM parsing.
+- Migration checklist:
+  - [x] Replace `reqwest` usage in `src/html.rs`, `md5_utils.rs`,
+    `wget_list.rs`, `mirrors.rs`, and the ingest pipelines.
+  - [x] Rework `binutils` cross toolchain workflow to operate synchronously,
+    eliminating tokio runtime/bootstrap.
+  - [ ] Drop `tokio` and `reqwest` from `Cargo.toml` once TUI workflows stop
+    using tracing instrumentation hooks that pulled them in transitively.
+  - [ ] Audit for remaining `tracing` dependencies and migrate to the
+    lightweight logging facade (`log` + `env_logger` or custom adapter) for
+    non-TUI code.
+- Follow-up ideas:
+  - Provide feature flag `full-net` that re-enables async clients when needed
+    for high-concurrency mirror probing.
+  - Benchmark `ureq` vs `reqwest` on `metadata_indexer harvest` to ensure we
+    don’t regress throughput noticeably.
+
+# README Generation Framework (Markdown RFC)
+
+- Goal: author the project README in Rust, using a small domain-specific
+  builder that outputs GitHub-flavoured Markdown (GFM) from structured
+  sections.
+- Design sketch:
+  - New crate/workspace member `readme_builder` under `tools/` exposing a
+    fluent API (`Doc::new().section("Intro", |s| ...)`).
+  - Source-of-truth lives in `tools/readme/src/main.rs`; running `cargo run -p
+    readme_builder` writes to `README.md`.
+  - Provide reusable primitives: `Heading`, `Paragraph`, `CodeBlock`,
+    `Table::builder()`, `Callout::note("...")`, `Badge::docsrs()`, etc.
+  - Keep rendering deterministic (sorted sections, stable wrapping) so diffs
+    remain reviewable.
+- Tasks:
+  - [ ] Scaffold `tools/readme` crate with CLI that emits to stdout or
+    specified path (`--output README.md`).
+  - [ ] Model README sections as enums/structs with `Display` impls to enforce
+    consistency.
+  - [ ] Port current README structure into builder code, annotate with inline
+    comments describing regeneration steps.
+  - [ ] Add `make readme` (or `cargo xtask readme`) to rebuild documentation as
+    part of release workflow.
+  - [ ] Document in CONTRIBUTING how to edit the Rust source instead of the
+    raw Markdown.
+- Stretch goals:
+  - Emit additional artefacts (e.g., `docs/CHANGELOG.md`) from the same source
+    modules.
+  - Allow embedding generated tables from Cargo metadata (dependency stats,
+    feature lists).
