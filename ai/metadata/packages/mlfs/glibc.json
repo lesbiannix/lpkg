@@ -1,0 +1,289 @@
+{
+  "artifacts": {
+    "disk": 870,
+    "install_prefix": null,
+    "sbu": 1.0
+  },
+  "build": [
+    {
+      "commands": [
+        "ln -sfv ../lib/ld-linux-x86-64.so.2 $LFS/lib64",
+        "ln -sfv ../lib/ld-linux-x86-64.so.2 $LFS/lib64/ld-lsb-x86-64.so.3"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "patch -Np1 -i ../glibc-2.42-fhs-1.patch"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "mkdir -v build",
+        "cd       build"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "setup",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "echo \"rootsbindir=/usr/sbin\" > configparms"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "../configure                             \\",
+        "--prefix=/usr                      \\",
+        "--host=$LFS_TGT                    \\",
+        "--build=$(../scripts/config.guess) \\",
+        "--disable-nscd                     \\",
+        "libc_cv_slibdir=/usr/lib           \\",
+        "--enable-kernel=5.4"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "configure",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make DESTDIR=$LFS install"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "sed '/RTLDLIST=/s@/usr@@g' -i $LFS/usr/bin/ldd"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "echo 'int main(){}' | $LFS_TGT-gcc -x c - -v -Wl,--verbose &> dummy.log",
+        "readelf -l a.out | grep ': /lib'"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "grep -E -o \"$LFS/lib.*/S?crt[1in].*succeeded\" dummy.log"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "grep -B3 \"^ $LFS/usr/include\" dummy.log"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\\n|g'"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "grep \"/lib.*/libc.so.6 \" dummy.log"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "grep found dummy.log"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "rm -v a.out dummy.log"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make clean",
+        "find .. -name \"*.a\" -delete"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "CC=\"$LFS_TGT-gcc -m32\" \\",
+        "CXX=\"$LFS_TGT-g++ -m32\" \\",
+        "../configure                             \\",
+        "--prefix=/usr                      \\",
+        "--host=$LFS_TGT32                  \\",
+        "--build=$(../scripts/config.guess) \\",
+        "--disable-nscd                     \\",
+        "--with-headers=$LFS/usr/include    \\",
+        "--libdir=/usr/lib32                \\",
+        "--libexecdir=/usr/lib32            \\",
+        "libc_cv_slibdir=/usr/lib32         \\",
+        "--enable-kernel=5.4"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "configure",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make DESTDIR=$PWD/DESTDIR install",
+        "cp -a DESTDIR/usr/lib32 $LFS/usr/",
+        "install -vm644 DESTDIR/usr/include/gnu/{lib-names,stubs}-32.h \\",
+        "$LFS/usr/include/gnu/",
+        "ln -svf ../lib32/ld-linux.so.2 $LFS/lib/ld-linux.so.2"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "echo 'int main(){}' > dummy.c",
+        "$LFS_TGT-gcc -m32 dummy.c",
+        "readelf -l a.out | grep '/ld-linux'"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "rm -v dummy.c a.out"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    }
+  ],
+  "dependencies": {
+    "build": [],
+    "runtime": []
+  },
+  "environment": {
+    "users": [],
+    "variables": []
+  },
+  "optimizations": {
+    "cflags": [
+      "-O3",
+      "-flto"
+    ],
+    "enable_lto": true,
+    "enable_pgo": true,
+    "ldflags": [
+      "-flto"
+    ],
+    "profdata": null
+  },
+  "package": {
+    "anchors": {
+      "section": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/glibc.html#ch-tools-glibc"
+    },
+    "book": "mlfs",
+    "chapter": 5,
+    "id": "mlfs/glibc",
+    "name": "Glibc",
+    "section": "5.5",
+    "stage": "cross-toolchain",
+    "upstream": null,
+    "variant": null,
+    "version": "2.42"
+  },
+  "provenance": {
+    "book_release": "lfs-ml-12.4-40-multilib",
+    "content_hash": "52b9b51a37f960c3d8694d06cfd1a8ef297a3a2e473e565f402765b24c4e2329",
+    "page_url": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/glibc.html",
+    "retrieved_at": "2025-10-01T05:30:28.195848+00:00"
+  },
+  "schema_version": "v0.1.0",
+  "source": {
+    "archive": "glibc-2.42.tar.xz",
+    "checksums": [
+      {
+        "alg": "md5",
+        "value": "23c6f5a27932b435cae94e087cb8b1f5"
+      }
+    ],
+    "urls": [
+      {
+        "kind": "primary",
+        "url": "https://ftp.gnu.org/gnu/glibc/glibc-2.42.tar.xz"
+      },
+      {
+        "kind": "primary",
+        "url": "https://www.linuxfromscratch.org/patches/lfs/development/glibc-2.42-fhs-1.patch"
+      }
+    ]
+  },
+  "status": {
+    "issues": [],
+    "state": "draft"
+  }
+}

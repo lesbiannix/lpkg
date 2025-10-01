@@ -1,0 +1,81 @@
+{
+  "artifacts": {
+    "disk": 1,
+    "install_prefix": null,
+    "sbu": 0.0
+  },
+  "build": [
+    {
+      "commands": [
+        "make mrproper"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    },
+    {
+      "commands": [
+        "make headers",
+        "find usr/include -type f ! -name '*.h' -delete",
+        "cp -rv usr/include $LFS/usr"
+      ],
+      "cwd": null,
+      "notes": null,
+      "phase": "build",
+      "requires_root": false
+    }
+  ],
+  "dependencies": {
+    "build": [],
+    "runtime": []
+  },
+  "environment": {
+    "users": [],
+    "variables": []
+  },
+  "optimizations": {
+    "cflags": [
+      "-O3",
+      "-flto"
+    ],
+    "enable_lto": true,
+    "enable_pgo": true,
+    "ldflags": [
+      "-flto"
+    ],
+    "profdata": null
+  },
+  "package": {
+    "anchors": {
+      "section": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/linux-headers.html#ch-tools-linux-headers"
+    },
+    "book": "mlfs",
+    "chapter": 5,
+    "id": "mlfs/linux",
+    "name": "Linux",
+    "section": "5.4",
+    "stage": "cross-toolchain",
+    "upstream": null,
+    "variant": null,
+    "version": "6.16.9 API Headers"
+  },
+  "provenance": {
+    "book_release": "lfs-ml-12.4-40-multilib",
+    "content_hash": "cd251fbfaaa5da1eb43185331f5beaa07cdd9d50c79f19be266435781195b66d",
+    "page_url": "https://linuxfromscratch.org/~thomas/multilib-m32/chapter05/linux-headers.html",
+    "retrieved_at": "2025-10-01T05:30:14.291785+00:00"
+  },
+  "schema_version": "v0.1.0",
+  "source": {
+    "archive": null,
+    "checksums": [],
+    "urls": []
+  },
+  "status": {
+    "issues": [
+      "No source URLs with archive extensions detected"
+    ],
+    "state": "draft"
+  }
+}

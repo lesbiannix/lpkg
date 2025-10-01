@@ -1,15 +1,45 @@
 {
-  "generated_at": "2025-10-01T04:35:27.106227+00:00",
+  "generated_at": "2025-10-01T05:54:56.228701+00:00",
   "packages": [
     {
       "book": "mlfs",
-      "id": "mlfs/binutils/pass1",
+      "id": "mlfs/linux",
+      "name": "Linux",
+      "path": "packages/mlfs/linux-headers.json",
+      "stage": "cross-toolchain",
+      "status": "draft",
+      "variant": null,
+      "version": "6.16.9 API Headers"
+    },
+    {
+      "book": "mlfs",
+      "id": "mlfs/glibc",
+      "name": "Glibc",
+      "path": "packages/mlfs/glibc.json",
+      "stage": "cross-toolchain",
+      "status": "draft",
+      "variant": null,
+      "version": "2.42"
+    },
+    {
+      "book": "mlfs",
+      "id": "mlfs/binutils-pass-1",
       "name": "Binutils",
-      "path": "packages/mlfs/binutils-pass1.json",
+      "path": "packages/mlfs/binutils-pass-1.json",
       "stage": "cross-toolchain",
       "status": "draft",
       "variant": "Pass 1",
       "version": "2.45"
+    },
+    {
+      "book": "mlfs",
+      "id": "mlfs/gcc-pass-1",
+      "name": "GCC",
+      "path": "packages/mlfs/gcc-pass-1.json",
+      "stage": "cross-toolchain",
+      "status": "draft",
+      "variant": "Pass 1",
+      "version": "15.2.0"
     }
   ],
   "schema_version": "v0.1.0"
