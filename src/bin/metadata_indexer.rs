@@ -37,6 +37,15 @@ enum Command {
         #[arg(long)]
         compact: bool,
     },
+    /// Refresh cached jhalfs manifests for the given book(s)
+    Refresh {
+        /// Books to refresh (defaults to all known books)
+        #[arg(long, value_delimiter = ',', default_value = "mlfs,lfs,blfs,glfs")]
+        books: Vec<String>,
+        /// Force re-download even if cache files exist
+        #[arg(long)]
+        force: bool,
+    },
     /// Fetch and draft metadata for a specific package page
     Harvest {
         /// Book identifier (lfs, mlfs, blfs, glfs)
@@ -179,6 +188,37 @@ fn main() -> Result<()> {
                     "Run `metadata_indexer --base-dir {} index` to refresh the index.",
                     base_dir.display()
                 );
+            }
+        }
+        Command::Refresh { books, force } => {
+            let unique: HashSet<_> = books.into_iter().map(|b| b.to_lowercase()).collect();
+            let mut refreshed = 0usize;
+            for book in unique {
+                for kind in [ManifestKind::WgetList, ManifestKind::Md5Sums] {
+                    match refresh_manifest(&metadata_dir, &book, kind, force) {
+                        Ok(path) => {
+                            refreshed += 1;
+                            println!(
+                                "Refreshed {} manifest for {} -> {}",
+                                kind.description(),
+                                book,
+                                path.display()
+                            );
+                        }
+                        Err(err) => {
+                            eprintln!(
+                                "warning: failed to refresh {} manifest for {}: {}",
+                                kind.description(),
+                                book,
+                                err
+                            );
+                        }
+                    }
+                }
+            }
+
+            if refreshed == 0 {
+                println!("No manifests refreshed (check warnings above).");
             }
         }
     }
@@ -697,6 +737,7 @@ struct SourceUrlEntry {
     kind: &'static str,
 }
 
+#[derive(Clone, Copy)]
 enum ManifestKind {
     WgetList,
     Md5Sums,
@@ -707,6 +748,13 @@ impl ManifestKind {
         match self {
             ManifestKind::WgetList => "wget-list.txt",
             ManifestKind::Md5Sums => "md5sums.txt",
+        }
+    }
+
+    fn description(&self) -> &'static str {
+        match self {
+            ManifestKind::WgetList => "wget-list",
+            ManifestKind::Md5Sums => "md5sums",
         }
     }
 }
@@ -824,14 +872,24 @@ fn resolve_checksums(
 }
 
 fn load_jhalfs_manifest(metadata_dir: &Path, book: &str, kind: ManifestKind) -> Result<String> {
+    let cache_path = refresh_manifest(metadata_dir, book, kind, false)?;
+    fs::read_to_string(&cache_path)
+        .with_context(|| format!("reading cached manifest {}", cache_path.display()))
+}
+
+fn refresh_manifest(
+    metadata_dir: &Path,
+    book: &str,
+    kind: ManifestKind,
+    force: bool,
+) -> Result<PathBuf> {
     let cache_dir = metadata_dir.join("cache");
     fs::create_dir_all(&cache_dir)
         .with_context(|| format!("creating cache directory {}", cache_dir.display()))?;
 
     let cache_path = cache_dir.join(format!("{}-{}", book, kind.filename()));
-    if cache_path.exists() {
-        return fs::read_to_string(&cache_path)
-            .with_context(|| format!("reading cached manifest {}", cache_path.display()));
+    if cache_path.exists() && !force {
+        return Ok(cache_path);
     }
 
     let url = manifest_url(book, &kind)
@@ -850,7 +908,7 @@ fn load_jhalfs_manifest(metadata_dir: &Path, book: &str, kind: ManifestKind) -> 
     fs::write(&cache_path, &body)
         .with_context(|| format!("caching manifest {}", cache_path.display()))?;
 
-    Ok(body)
+    Ok(cache_path)
 }
 
 fn manifest_url(book: &str, kind: &ManifestKind) -> Option<&'static str> {

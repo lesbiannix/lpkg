@@ -120,6 +120,15 @@ cargo run --bin metadata_indexer -- \
   --dry-run
 ```
 
+Keep the jhalfs manifests current with:
+
+```bash
+cargo run --bin metadata_indexer -- --base-dir . refresh
+```
+
+Passing `--books mlfs,blfs` restricts the refresh to specific books, and
+`--force` bypasses the local cache.
+
 ## 📚 Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md) – high-level tour of the crate

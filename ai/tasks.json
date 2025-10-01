@@ -51,6 +51,13 @@
       "description": "Provide a standalone CLI to validate package metadata against the schema and regenerate ai/metadata/index.json.",
       "resolution": "Added src/bin/metadata_indexer.rs with schema validation, summary extraction, and index writer integration.",
       "owner": "default_cli"
+    },
+    {
+      "id": "metadata-jhalfs-refresh",
+      "title": "Wire jhalfs manifests into metadata harvester",
+      "description": "Cache wget-list/md5sums from jhalfs and expose a CLI refresh command so harvesting can populate source URLs and checksums reliably.",
+      "resolution": "Extended metadata_indexer with a `refresh` subcommand, cached manifests under ai/metadata/cache/, and hooked harvest to populate MD5 checksums via jhalfs data.",
+      "owner": "default_cli"
     }
   ]
 }

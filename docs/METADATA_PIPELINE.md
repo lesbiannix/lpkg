@@ -19,7 +19,8 @@ This document explains the workflow and the supporting assets.
 | ------- | ----------- |
 | `validate` | Loads every package JSON file and validates it against `schema.json`. Reports schema violations and summary extraction errors. |
 | `index` | Re-runs validation and regenerates `index.json`. Use `--compact` to write a single-line JSON payload. |
-| `harvest` | Fetches a book page, scrapes build instructions, and emits a draft metadata record (to stdout with `--dry-run` or into `ai/metadata/packages/`). |
+| `harvest` | Fetches a book page, scrapes build instructions, and emits a draft metadata record (to stdout with `--dry-run` or into `ai/metadata/packages/`). Falls back to jhalfs manifests when inline source links are absent. |
+| `refresh` | Updates cached jhalfs manifests (`wget-list`, `md5sums`) under `ai/metadata/cache/`. Supports `--books` filtering and `--force` to bypass the cache. |
 
 ### Harvesting flow
 
@@ -32,11 +33,10 @@ This document explains the workflow and the supporting assets.
 4. **Artifact stats** – `div.segmentedlist` entries supply SBU and disk usage.
 5. **Source URLs** – the harvester tries two strategies:
    - Inline HTML links inside the page (common for BLFS articles).
-   - Fallback to the jhalfs `wget-list` for the selected book (currently MLFS)
-     using `package-management::wget_list::get_wget_list` to find matching
-     `<package>-<version>` entries.
-6. **Checksums** – integration with the book’s `md5sums` mirror is pending;
-   placeholder wiring exists (`src/md5_utils.rs`).
+   - Fallback to the cached jhalfs `wget-list` for the selected book to find
+     matching `<package>-<version>` entries.
+6. **Checksums** – the matching entry from the cached jhalfs `md5sums`
+   manifest populates `source.checksums` when the archive name is known.
 7. **Status** – unresolved items (missing URLs, anchors, etc.) are recorded in
    `status.issues` so humans can interrogate or patch the draft before
    promoting it.
@@ -46,8 +46,6 @@ This document explains the workflow and the supporting assets.
 - **Source links via tables** – some MLFS chapters list download links inside a
   “Package Information” table. The current implementation relies on the
   jhalfs `wget-list` fallback instead of parsing that table.
-- **Checksums** – MD5 lookups from jhalfs are planned but not yet wired into
-  the harvest pipeline.
 - **Anchor discovery** – if the heading lacks an explicit `id` attribute, the
   scraper attempts to locate child anchors or scan the raw HTML. If none are
   found, a warning is recorded and `status.issues` contains a reminder.
@@ -55,17 +53,15 @@ This document explains the workflow and the supporting assets.
 ## Using jhalfs manifests
 
 The maintained `wget-list`/`md5sums` files hosted by jhalfs provide canonical
-source URLs and hashes. The helper modules `src/wget_list.rs` and
-`src/md5_utils.rs` download these lists for the multilib LFS book. The
-harvester currently consumes the wget-list as a fallback; integrating the
-`md5sums` file will let us emit `source.checksums` automatically.
+source URLs and hashes. The `metadata_indexer refresh` command keeps these
+manifests cached under `ai/metadata/cache/`. Harvesting consumes the cached
+copies to populate URLs and MD5 checksums.
 
 Planned enhancements (see `ai/notes.md` and `ai/bugs.json#metadata-harvest-no-source-urls`):
 
 1. Abstract list fetching so BLFS/GLFS variants can reuse the logic.
 2. Normalise the match criteria for package + version (handling pass stages,
    suffixes, etc.).
-3. Populate checksum entries alongside URLs.
 
 ## Manual review checklist
 

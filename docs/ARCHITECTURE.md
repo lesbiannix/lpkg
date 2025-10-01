@@ -42,8 +42,11 @@ artifacts under `ai/metadata/`:
   `ai/metadata/index.json` (use `--compact` for single-line JSON).
 - `harvest` – fetches a given book page, extracts build metadata, and emits a
   schema-compliant JSON skeleton. When direct HTML parsing does not locate the
-  source tarball, it falls back to the jhalfs `wget-list` data to populate
-  `source.urls`.
+  source tarball, it falls back to cached jhalfs manifests to populate
+  `source.urls` and MD5 checksums.
+- `refresh` – downloads (or re-downloads with `--force`) the jhalfs manifests
+  (`wget-list`, `md5sums`) for one or more books and stores them under
+  `ai/metadata/cache/`.
 
 ## Module layout
 
