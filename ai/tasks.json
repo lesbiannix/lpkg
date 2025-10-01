@@ -83,6 +83,24 @@
         "mlfs-package-import",
         "lfs-html-parsers"
       ]
+    },
+    {
+      "id": "dependency-audit",
+      "title": "Keep lpkg dependency footprint lean",
+      "description": "Regularly evaluate crates for bloat and replace heavy stacks with std or lightweight alternatives.",
+      "owner": "default_cli",
+      "priority": "medium",
+      "next_actions": [
+        "Track remaining crates pulling in large transitive trees (e.g. tracing, actix-only paths)",
+        "Automate cargo-tree diff reports in CI",
+        "Document substitution patterns (tokio ➜ std, reqwest ➜ ureq, etc.)"
+      ],
+      "success_metrics": [
+        "Default `cargo build` compiles < 140 crates",
+        "No async runtimes linked when GraphQL feature is disabled",
+        "README lists regeneration commands for all generated assets"
+      ],
+      "notes": "Continue pruning optional crates (tracing, gptman, uuid) when the TUI feature is off; surface findings in ai/notes.md."
     }
   ],
   "solved": [
@@ -112,6 +130,13 @@
       "title": "Wire jhalfs manifests into metadata harvester",
       "description": "Cache wget-list/md5sums from jhalfs and expose a CLI refresh command so harvesting can populate source URLs and checksums reliably.",
       "resolution": "Extended metadata_indexer with a `refresh` subcommand, cached manifests under ai/metadata/cache/, and hooked harvest to populate MD5 checksums via jhalfs data.",
+      "owner": "default_cli"
+    },
+    {
+      "id": "lightweight-http-stack",
+      "title": "Replace async HTTP stack with lightweight blocking client",
+      "description": "Remove tokio/reqwest default dependency and adopt a minimal HTTP client for CLI workflows.",
+      "resolution": "Swapped reqwest/tokio for ureq across html, ingest, and metadata tooling; added PGO-aware Cargo profiles and documented regeneration commands.",
       "owner": "default_cli"
     }
   ]

@@ -95,5 +95,28 @@ Open questions:
 - Stretch goals:
   - Emit additional artefacts (e.g., `docs/CHANGELOG.md`) from the same source
     modules.
-  - Allow embedding generated tables from Cargo metadata (dependency stats,
-    feature lists).
+- Allow embedding generated tables from Cargo metadata (dependency stats,
+  feature lists).
+
+# Dependency Slimming Log
+
+- 2025-03: Replaced `reqwest`/`tokio` async stack with `ureq`; default builds
+  now avoid pulling in hyper/quinn/tower trees. GraphQL feature gate still pulls
+  Actix/tokio, but only when enabled.
+- Added `.cargo/config.toml` profiles: dev stays at `opt-level=0`, release uses
+  LTO fat + `-O3`, and PGO profiles expose `cargo pgo-instrument`/`cargo
+  pgo-build` aliases.
+- All SVG artefacts (core logo, Nixette logo/mascot/wallpaper) are now generated
+  by Rust binaries under `src/bin/*_gen.rs` using a shared `svg_builder` module.
+  Regeneration steps:
+  ```bash
+  cargo run --bin logo_gen
+  cargo run --bin nixette_logo_gen
+  cargo run --bin nixette_mascot_gen
+  cargo run --bin nixette_wallpaper_gen
+  ```
+- README is produced via `cargo run --bin readme_gen`; contributors should edit
+  the builder source instead of the Markdown output.
+- Remaining work: trim tracing/Actix dependencies inside the TUI path,
+  investigate replacing `gptman` for non-critical disk UI builds, and pin a
+  cargo `deny` audit to alert on large transitive graphs.
