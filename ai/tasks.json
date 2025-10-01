@@ -4,41 +4,85 @@
     {
       "id": "mlfs-package-import",
       "title": "Import all MLFS packages into lpkg",
-      "description": "Parse the Multilib LFS book and scaffold package definitions with optimization defaults (LTO/PGO/-O3).",
+      "description": "Parse the Multilib LFS book and scaffold package definitions with optimisation defaults (LTO/PGO/-O3).",
+      "owner": "mlfs_researcher",
+      "priority": "critical",
+      "target_release": "0.3.0",
       "blocked_on": [
         "Finalize metadata -> Rust module generation pipeline",
         "Implement automated parser"
       ],
-      "owner": "mlfs_researcher"
+      "next_actions": [
+        "Cross-check ai/metadata coverage vs. MLFS chapter index",
+        "Batch-run import workflow in dry-run mode to detect schema gaps",
+        "Document manual overrides for multi-pass toolchain packages"
+      ],
+      "success_metrics": [
+        ">= 95% of MLFS packages imported with build/install commands",
+        "Generated modules compile under cargo check --features graphql",
+        "Metadata index remains <2 seconds to validate on CI"
+      ],
+      "notes": "Coordinate closely with rust-module-generator to avoid duplicated scaffolding logic."
     },
     {
       "id": "pgo-integration",
       "title": "Integrate profile guided optimization support",
       "description": "Add infrastructure for collection and replay of profiling data during package builds.",
+      "owner": "default_cli",
+      "priority": "high",
       "blocked_on": [
         "Decide on profiling workload definitions"
       ],
-      "owner": "default_cli"
+      "next_actions": [
+        "Capture baseline timings for release vs release-pgo",
+        "Prototype lightweight profiling harness (shell or cargo alias)",
+        "Document warmup requirements for long-running packages"
+      ],
+      "success_metrics": [
+        "release-pgo builds show >8% speedup on binutils/gcc workloads",
+        "PGO instrumentation + merge flow documented in README",
+        "CI job ensures profiles are optional but never stale"
+      ]
     },
     {
       "id": "lfs-html-parsers",
       "title": "Automate LFS/BLFS/GLFS ingest via HTML parsing",
       "description": "Avoid hardcoded package data; download the upstream books (LFS, BLFS, GLFS) and parse them to drive scaffolding and metadata updates.",
+      "owner": "mlfs_researcher",
+      "priority": "medium",
       "blocked_on": [
         "Design resilient scraping strategies for each book",
         "Implement incremental update workflow"
       ],
-      "owner": "mlfs_researcher"
+      "next_actions": [
+        "Audit selectors currently used by ai/metadata harvester",
+        "Introduce regression fixtures for common chapter archetypes",
+        "Add revalidation mode to detect silent upstream markup changes"
+      ],
+      "risks": [
+        "Upstream XHTML sometimes reflows anchors without notice",
+        "Need rate limiting/backoff when mirrors throttle requests"
+      ]
     },
     {
       "id": "rust-module-generator",
       "title": "Generate package modules from harvested metadata",
       "description": "Transform harvested metadata into Rust files under src/pkgs/by_name, wiring PackageDefinition data directly.",
+      "owner": "default_cli",
+      "priority": "high",
       "blocked_on": [
         "Define translation scheme from metadata to PackageDefinition",
         "Integrate generator with metadata_indexer output"
       ],
-      "owner": "default_cli"
+      "next_actions": [
+        "Add snapshot tests comparing generated modules vs golden outputs",
+        "Extend generator to emit README snippets for each package",
+        "Expose --dry-run summary with diff previews"
+      ],
+      "dependencies": [
+        "mlfs-package-import",
+        "lfs-html-parsers"
+      ]
     }
   ],
   "solved": [
