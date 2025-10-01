@@ -21,6 +21,7 @@ This document explains the workflow and the supporting assets.
 | `index` | Re-runs validation and regenerates `index.json`. Use `--compact` to write a single-line JSON payload. |
 | `harvest` | Fetches a book page, scrapes build instructions, and emits a draft metadata record (to stdout with `--dry-run` or into `ai/metadata/packages/`). Falls back to jhalfs manifests when inline source links are absent. |
 | `refresh` | Updates cached jhalfs manifests (`wget-list`, `md5sums`) under `ai/metadata/cache/`. Supports `--books` filtering and `--force` to bypass the cache. |
+| `generate` | Translates harvested metadata into Rust modules under `src/pkgs/by_name` (or a specified directory), using the scaffolder to create `PackageDefinition` wrappers. |
 
 ### Harvesting flow
 

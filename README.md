@@ -129,6 +129,17 @@ cargo run --bin metadata_indexer -- --base-dir . refresh
 Passing `--books mlfs,blfs` restricts the refresh to specific books, and
 `--force` bypasses the local cache.
 
+To materialise a Rust module from harvested metadata:
+
+```bash
+cargo run --bin metadata_indexer -- \
+  --base-dir . generate \
+  --metadata ai/metadata/packages/mlfs/binutils-pass-1.json \
+  --output target/generated/by_name
+```
+
+Add `--overwrite` to regenerate an existing module directory.
+
 ## 📚 Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md) – high-level tour of the crate

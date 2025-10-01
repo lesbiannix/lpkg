@@ -13,6 +13,8 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use walkdir::WalkDir;
 
+use package_management::pkgs::generator;
+
 #[derive(Parser)]
 #[command(
     name = "metadata-indexer",
@@ -63,6 +65,18 @@ enum Command {
         /// Do not write to disk, just print JSON to stdout
         #[arg(long)]
         dry_run: bool,
+    },
+    /// Generate Rust modules from harvested metadata
+    Generate {
+        /// Path to the harvested metadata JSON file
+        #[arg(long)]
+        metadata: PathBuf,
+        /// Output directory (should be the `by_name` root)
+        #[arg(long, default_value = "src/pkgs/by_name")]
+        output: PathBuf,
+        /// Remove existing module directory before regeneration
+        #[arg(long)]
+        overwrite: bool,
     },
 }
 
@@ -220,6 +234,31 @@ fn main() -> Result<()> {
             if refreshed == 0 {
                 println!("No manifests refreshed (check warnings above).");
             }
+        }
+        Command::Generate {
+            metadata,
+            output,
+            overwrite,
+        } => {
+            if overwrite {
+                match generator::module_directory(&metadata, &output) {
+                    Ok(dir) if dir.exists() => {
+                        fs::remove_dir_all(&dir).with_context(|| {
+                            format!("removing existing module {}", dir.display())
+                        })?;
+                    }
+                    Ok(_) => {}
+                    Err(err) => {
+                        eprintln!(
+                            "warning: could not determine existing module directory: {}",
+                            err
+                        );
+                    }
+                }
+            }
+
+            let module_path = generator::generate_module(&metadata, &output)?;
+            println!("Generated module at {}", module_path.display());
         }
     }
 

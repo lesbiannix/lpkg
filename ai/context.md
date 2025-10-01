@@ -5,7 +5,9 @@
   first when revisiting the project.
 - `metadata_indexer` now supports a `refresh` command that pulls jhalfs
   `wget-list`/`md5sums` manifests into `ai/metadata/cache/` and the `harvest`
-  command automatically draws URLs and checksums from those manifests.
+  command automatically draws URLs and checksums from those manifests. A
+  `generate` subcommand consumes harvested metadata and scaffolds Rust modules
+  under `src/pkgs/by_name` (or a custom output directory).
 - AI state lives under `ai/`:
   - `ai/personas.json`, `ai/tasks.json`, `ai/bugs.json` track personas,
     outstanding work, and known issues.
